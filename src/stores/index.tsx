@@ -6,9 +6,11 @@
  * Using Context API + useReducer pattern for state management.
  */
 
+import React from 'react';
+
 // Authentication Context
 export { AuthProvider, useAuth } from './auth';
-export type { AuthState, AuthAction, AuthContextProps, User } from './auth';
+export type { AuthState, AuthAction, AuthContextType } from './auth';
 
 // Book Management Context
 export { BookProvider, useBook } from './book';
@@ -71,15 +73,15 @@ export type {
   PrivacySettings 
 } from './user';
 
-// Combined Provider Component for easy app-wide setup
-import React from 'react';
-import { AuthProvider } from './auth';
-import { BookProvider } from './book';
-import { QuizProvider } from './quiz';
-import { ARProvider } from './ar';
-import { GamificationProvider } from './gamification';
-import { EnhancedUserProvider } from './user/EnhancedUserContext';
+// Import providers for StoreProvider
+import { AuthProvider, useAuth } from './auth';
+import { BookProvider, useBook } from './book';
+import { QuizProvider, useQuiz } from './quiz';
+import { ARProvider, useAR } from './ar';
+import { GamificationProvider, useGamification } from './gamification';
+import { EnhancedUserProvider, useEnhancedUser } from './user/EnhancedUserContext';
 
+// Combined Provider Component for easy app-wide setup
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <AuthProvider>
