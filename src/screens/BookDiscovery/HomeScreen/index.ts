@@ -1,7 +1,7 @@
 /**
- * HomeScreen Export Index
+ * HomeScreen Exports
  * 
- * Clean exports following AlLibrary coding rules.
+ * Clean exports for the HomeScreen following AlLibrary coding rules.
  */
 
 export { HomeScreen } from './HomeScreen';

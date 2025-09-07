@@ -1,7 +1,7 @@
 /**
- * PermissionSetup Export Index
+ * PermissionSetup Screen Exports
  * 
- * Clean exports following AlLibrary coding rules.
+ * Clean exports for the PermissionSetup screen following AlLibrary coding rules.
  */
 
 export { PermissionSetup } from './PermissionSetup';

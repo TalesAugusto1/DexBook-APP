@@ -7,15 +7,14 @@
 
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
-import { useRouter } from 'expo-router';
-import { appInfo } from '../../../config/app.config';
+import { useNavigation } from '@react-navigation/native';
 
 interface SplashScreenProps {
   // No props needed for splash screen
 }
 
 export const SplashScreen: React.FC<SplashScreenProps> = () => {
-  const router = useRouter();
+  const navigation = useNavigation();
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
   const scaleAnim = React.useRef(new Animated.Value(0.8)).current;
 
@@ -37,11 +36,11 @@ export const SplashScreen: React.FC<SplashScreenProps> = () => {
 
     // Navigate to welcome screen after 2 seconds
     const timer = setTimeout(() => {
-      router.replace('/welcome');
+      navigation.navigate('Welcome' as never);
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, [fadeAnim, scaleAnim, router]);
+  }, [fadeAnim, scaleAnim, navigation]);
 
   return (
     <View style={styles.container}>
@@ -56,7 +55,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = () => {
       >
         <Text style={styles.title}>AR Book Explorer</Text>
         <Text style={styles.subtitle}>Interactive Learning Experience</Text>
-        <Text style={styles.version}>Version {appInfo.version}</Text>
+        <Text style={styles.version}>Version 1.0.0</Text>
       </Animated.View>
     </View>
   );

@@ -1,230 +1,167 @@
 /**
- * LoginRegister Component for AR Book Explorer
+ * LoginRegister Screen Component for AR Book Explorer
  * 
- * This screen handles user authentication with COPPA compliance.
+ * This screen handles user authentication and registration.
  * Following AlLibrary coding rules for accessibility-first design and universal access.
  */
 
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
-import { useRouter } from 'expo-router';
-import { auth } from '../../../config/firebase.config';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { Button, Card, Input } from '../../../components/foundation';
+import { useAuth } from '../../../stores/auth/AuthContext';
 
-interface LoginRegisterProps {
-  // No props needed for login/register screen
-}
-
-export const LoginRegister: React.FC<LoginRegisterProps> = () => {
-  const router = useRouter();
+export const LoginRegister: React.FC = () => {
+  const navigation = useNavigation();
+  const { login, register, state } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [name, setName] = useState('');
-  const [age, setAge] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    name: '',
+    age: '',
+    grade: '',
+  });
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
 
   const handleAuth = async () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all required fields');
-      return;
-    }
-
-    if (!isLogin && password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
-      return;
-    }
-
-    if (!isLogin && !name) {
-      Alert.alert('Error', 'Please enter your name');
-      return;
-    }
-
-    if (!isLogin && !age) {
-      Alert.alert('Error', 'Please enter your age');
-      return;
-    }
-
-    const userAge = parseInt(age);
-    if (!isLogin && (isNaN(userAge) || userAge < 0 || userAge > 120)) {
-      Alert.alert('Error', 'Please enter a valid age');
-      return;
-    }
-
-    setIsLoading(true);
-
     try {
       if (isLogin) {
-        // Login logic
-        await auth.signInWithEmailAndPassword(email, password);
-        router.replace('/home');
-      } else {
-        // Register logic with COPPA compliance
-        if (userAge < 13) {
-          Alert.alert(
-            'Parental Consent Required',
-            'Users under 13 require parental consent. Please have a parent or guardian complete the registration.',
-            [
-              { text: 'Cancel', style: 'cancel' },
-              { text: 'Continue', onPress: () => handleRegistration() },
-            ]
-          );
-        } else {
-          await handleRegistration();
-        }
-      }
-    } catch (error: any) {
-      console.error('Authentication error:', error);
-      Alert.alert('Error', error.message || 'Authentication failed');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleRegistration = async () => {
-    try {
-      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-      
-      // Store additional user data
-      if (userCredential.user) {
-        await userCredential.user.updateProfile({
-          displayName: name,
+        await login({
+          email: formData.email,
+          password: formData.password,
         });
-
-        // Store user metadata in Firestore
-        // This would be implemented with Firestore service
-        console.log('User registered successfully');
+        navigation.navigate('ProfileDashboard' as never);
+      } else {
+        await register({
+          email: formData.email,
+          password: formData.password,
+          confirmPassword: formData.confirmPassword,
+          name: formData.name,
+          age: parseInt(formData.age),
+          grade: formData.grade,
+        });
+        navigation.navigate('ProfileSetup' as never);
       }
-
-      router.replace('/profile-setup');
-    } catch (error: any) {
-      throw error;
+    } catch {
+      // Error handling is managed by the auth context
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    // Google Sign-In implementation would go here
-    Alert.alert('Coming Soon', 'Google Sign-In will be available soon');
-  };
-
-  const handleAppleSignIn = async () => {
-    // Apple Sign-In implementation would go here
-    Alert.alert('Coming Soon', 'Apple Sign-In will be available soon');
+  const toggleMode = () => {
+    setIsLogin(!isLogin);
+    setFormData({ email: '', password: '', confirmPassword: '', name: '', age: '', grade: '' });
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>
           {isLogin ? 'Welcome Back' : 'Create Account'}
         </Text>
         <Text style={styles.subtitle}>
           {isLogin 
-            ? 'Sign in to continue your AR reading journey'
-            : 'Join AR Book Explorer and start your interactive learning adventure'
+            ? 'Sign in to continue your learning journey' 
+            : 'Join us to start your AR learning adventure'
           }
         </Text>
       </View>
 
-      <View style={styles.formContainer}>
-        {!isLogin && (
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Full Name</Text>
-            <TextInput
-              style={styles.input}
-              value={name}
-              onChangeText={setName}
-              placeholder="Enter your full name"
-              autoCapitalize="words"
-            />
-          </View>
-        )}
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Email Address</Text>
-          <TextInput
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            placeholder="Enter your email"
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-        </View>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Password</Text>
-          <TextInput
-            style={styles.input}
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Enter your password"
-            secureTextEntry
-          />
-        </View>
-
-        {!isLogin && (
-          <>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Confirm Password</Text>
-              <TextInput
-                style={styles.input}
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                placeholder="Confirm your password"
-                secureTextEntry
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Age</Text>
-              <TextInput
-                style={styles.input}
-                value={age}
-                onChangeText={setAge}
-                placeholder="Enter your age"
-                keyboardType="numeric"
-              />
-            </View>
-          </>
-        )}
-      </View>
-
-      <View style={styles.actionsContainer}>
-        <TouchableOpacity
-          style={[styles.primaryButton, isLoading && styles.buttonDisabled]}
-          onPress={handleAuth}
-          disabled={isLoading}
+      <View style={styles.content}>
+        <Card
+          title={isLogin ? 'Sign In' : 'Create Account'}
+          subtitle={isLogin ? 'Enter your credentials' : 'Fill in your details'}
+          variant="elevated"
+          size="medium"
+          style={styles.authCard}
         >
-          <Text style={styles.primaryButtonText}>
-            {isLoading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
-          </Text>
-        </TouchableOpacity>
+          <View style={styles.formContainer}>
+            <Input
+              label="Email Address"
+              placeholder="Enter your email"
+              value={formData.email}
+              onChangeText={(value: string) => handleInputChange('email', value)}
+              variant="outline"
+              size="medium"
+            />
 
-        <View style={styles.divider}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>or</Text>
-          <View style={styles.dividerLine} />
+            <Input
+              label="Password"
+              placeholder="Enter your password"
+              value={formData.password}
+              onChangeText={(value: string) => handleInputChange('password', value)}
+              variant="outline"
+              size="medium"
+              secureTextEntry
+            />
+
+            {!isLogin && (
+              <>
+                <Input
+                  label="Confirm Password"
+                  placeholder="Confirm your password"
+                  value={formData.confirmPassword}
+                  onChangeText={(value: string) => handleInputChange('confirmPassword', value)}
+                  variant="outline"
+                  size="medium"
+                  secureTextEntry
+                />
+
+                <Input
+                  label="Full Name"
+                  placeholder="Enter your full name"
+                  value={formData.name}
+                  onChangeText={(value: string) => handleInputChange('name', value)}
+                  variant="outline"
+                  size="medium"
+                />
+
+                <Input
+                  label="Age"
+                  placeholder="Enter your age"
+                  value={formData.age}
+                  onChangeText={(value: string) => handleInputChange('age', value)}
+                  variant="outline"
+                  size="medium"
+                  keyboardType="numeric"
+                />
+
+                <Input
+                  label="Grade Level"
+                  placeholder="Enter your grade"
+                  value={formData.grade}
+                  onChangeText={(value: string) => handleInputChange('grade', value)}
+                  variant="outline"
+                  size="medium"
+                />
+              </>
+            )}
+          </View>
+        </Card>
+
+        <View style={styles.actions}>
+          <Button
+            title={isLogin ? 'Sign In' : 'Create Account'}
+            onPress={handleAuth}
+            variant="primary"
+            size="large"
+            loading={state.isLoading}
+            disabled={state.isLoading}
+            style={styles.authButton}
+          />
+
+          <Button
+            title={isLogin ? 'Create New Account' : 'Already Have an Account?'}
+            onPress={toggleMode}
+            variant="outline"
+            size="large"
+            style={styles.toggleButton}
+          />
         </View>
-
-        <TouchableOpacity style={styles.socialButton} onPress={handleGoogleSignIn}>
-          <Text style={styles.socialButtonText}>Continue with Google</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.socialButton} onPress={handleAppleSignIn}>
-          <Text style={styles.socialButtonText}>Continue with Apple</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.footer}>
-        <TouchableOpacity onPress={() => setIsLogin(!isLogin)}>
-          <Text style={styles.footerText}>
-            {isLogin 
-              ? "Don't have an account? Sign up"
-              : "Already have an account? Sign in"
-            }
-          </Text>
-        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -235,101 +172,43 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#ffffff',
   },
-  contentContainer: {
-    padding: 24,
-    paddingTop: 60,
-  },
   header: {
-    marginBottom: 32,
+    alignItems: 'center',
+    marginBottom: 30,
+    marginTop: 60,
+    paddingHorizontal: 20,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     color: '#1e293b',
-    textAlign: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
     color: '#64748b',
     textAlign: 'center',
-    lineHeight: 24,
+  },
+  content: {
+    padding: 20,
+  },
+  authCard: {
+    marginBottom: 30,
   },
   formContainer: {
-    marginBottom: 32,
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#1e293b',
-    marginBottom: 8,
+    gap: 16,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    borderRadius: 8,
-    padding: 16,
-    fontSize: 16,
-    backgroundColor: '#ffffff',
+    marginBottom: 8,
   },
-  actionsContainer: {
-    marginBottom: 32,
+  actions: {
+    gap: 16,
   },
-  primaryButton: {
-    backgroundColor: '#2563eb',
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginBottom: 16,
+  authButton: {
+    marginBottom: 8,
   },
-  buttonDisabled: {
-    backgroundColor: '#94a3b8',
-  },
-  primaryButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 16,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#e2e8f0',
-  },
-  dividerText: {
-    marginHorizontal: 16,
-    color: '#64748b',
-    fontSize: 14,
-  },
-  socialButton: {
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  socialButtonText: {
-    color: '#1e293b',
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  footer: {
-    alignItems: 'center',
-  },
-  footerText: {
-    color: '#2563eb',
-    fontSize: 16,
-    fontWeight: '500',
+  toggleButton: {
+    marginBottom: 8,
   },
 });
 

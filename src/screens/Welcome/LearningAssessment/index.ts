@@ -1,7 +1,7 @@
 /**
- * LearningAssessment Export Index
+ * LearningAssessment Screen Exports
  * 
- * Clean exports following AlLibrary coding rules.
+ * Clean exports for the LearningAssessment screen following AlLibrary coding rules.
  */
 
 export { LearningAssessment } from './LearningAssessment';
