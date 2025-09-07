@@ -5,10 +5,11 @@
  * Following AlLibrary coding rules for accessibility-first design and universal access.
  */
 
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { appInfo } from '../../../config/app.config';
+import { Button, Card, Modal } from '../../../components/foundation';
 
 interface WelcomeScreenProps {
   // No props needed for welcome screen
@@ -16,6 +17,7 @@ interface WelcomeScreenProps {
 
 export const WelcomeScreen: React.FC<WelcomeScreenProps> = () => {
   const router = useRouter();
+  const [showModal, setShowModal] = useState(false);
 
   const handleGetStarted = () => {
     router.push('/learning-assessment');
@@ -23,6 +25,10 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = () => {
 
   const handleSignIn = () => {
     router.push('/login');
+  };
+
+  const handleLearnMore = () => {
+    setShowModal(true);
   };
 
   return (
@@ -35,47 +41,74 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = () => {
       </View>
 
       <View style={styles.featuresContainer}>
-        <View style={styles.feature}>
+        <Card
+          title="AR-Enhanced Reading"
+          subtitle="Bring books to life with interactive 3D models and animations"
+          variant="elevated"
+          size="medium"
+          style={styles.featureCard}
+        >
           <Text style={styles.featureIcon}>📚</Text>
-          <Text style={styles.featureTitle}>AR-Enhanced Reading</Text>
-          <Text style={styles.featureDescription}>
-            Bring books to life with interactive 3D models and animations
-          </Text>
-        </View>
+        </Card>
 
-        <View style={styles.feature}>
+        <Card
+          title="AI-Powered Learning"
+          subtitle="Personalized quizzes and adaptive learning paths"
+          variant="elevated"
+          size="medium"
+          style={styles.featureCard}
+        >
           <Text style={styles.featureIcon}>🤖</Text>
-          <Text style={styles.featureTitle}>AI-Powered Learning</Text>
-          <Text style={styles.featureDescription}>
-            Personalized quizzes and adaptive learning paths
-          </Text>
-        </View>
+        </Card>
 
-        <View style={styles.feature}>
+        <Card
+          title="Gamification"
+          subtitle="Earn achievements and rewards as you learn"
+          variant="elevated"
+          size="medium"
+          style={styles.featureCard}
+        >
           <Text style={styles.featureIcon}>🎮</Text>
-          <Text style={styles.featureTitle}>Gamification</Text>
-          <Text style={styles.featureDescription}>
-            Earn achievements and rewards as you learn
-          </Text>
-        </View>
+        </Card>
 
-        <View style={styles.feature}>
+        <Card
+          title="Accessibility First"
+          subtitle="Universal design for all learners"
+          variant="elevated"
+          size="medium"
+          style={styles.featureCard}
+        >
           <Text style={styles.featureIcon}>♿</Text>
-          <Text style={styles.featureTitle}>Accessibility First</Text>
-          <Text style={styles.featureDescription}>
-            Universal design for all learners
-          </Text>
-        </View>
+        </Card>
       </View>
 
       <View style={styles.actionsContainer}>
-        <TouchableOpacity style={styles.primaryButton} onPress={handleGetStarted}>
-          <Text style={styles.primaryButtonText}>Get Started</Text>
-        </TouchableOpacity>
+        <Button
+          title="Get Started"
+          onPress={handleGetStarted}
+          variant="primary"
+          size="large"
+          style={styles.primaryButton}
+          accessibilityLabel="Start your AR Book Explorer journey"
+        />
 
-        <TouchableOpacity style={styles.secondaryButton} onPress={handleSignIn}>
-          <Text style={styles.secondaryButtonText}>I Already Have an Account</Text>
-        </TouchableOpacity>
+        <Button
+          title="I Already Have an Account"
+          onPress={handleSignIn}
+          variant="outline"
+          size="large"
+          style={styles.secondaryButton}
+          accessibilityLabel="Sign in to your existing account"
+        />
+
+        <Button
+          title="Learn More"
+          onPress={handleLearnMore}
+          variant="secondary"
+          size="medium"
+          style={styles.learnMoreButton}
+          accessibilityLabel="Learn more about AR Book Explorer features"
+        />
       </View>
 
       <View style={styles.footer}>
@@ -83,6 +116,45 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = () => {
           By continuing, you agree to our Terms of Service and Privacy Policy
         </Text>
       </View>
+
+      {/* Learn More Modal */}
+      <Modal
+        visible={showModal}
+        onClose={() => setShowModal(false)}
+        title="About AR Book Explorer"
+        subtitle="Discover the future of interactive learning"
+        variant="center"
+        size="large"
+        accessibilityLabel="Learn more about AR Book Explorer"
+      >
+        <View style={styles.modalContent}>
+          <Text style={styles.modalText}>
+            AR Book Explorer revolutionizes the way students learn by combining traditional reading 
+            with cutting-edge augmented reality technology. Our AI-powered system creates personalized 
+            learning experiences that adapt to each student's unique learning style.
+          </Text>
+          
+          <Text style={styles.modalText}>
+            Key Features:
+            {'\n'}• Interactive 3D models and animations
+            {'\n'}• AI-generated personalized quizzes
+            {'\n'}• Gamification with achievements and rewards
+            {'\n'}• Universal accessibility design
+            {'\n'}• Offline-first architecture
+          </Text>
+
+          <Button
+            title="Start Learning"
+            onPress={() => {
+              setShowModal(false);
+              handleGetStarted();
+            }}
+            variant="primary"
+            size="large"
+            style={styles.modalButton}
+          />
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -116,56 +188,25 @@ const styles = StyleSheet.create({
   featuresContainer: {
     marginBottom: 40,
   },
-  feature: {
+  featureCard: {
+    marginBottom: 16,
     alignItems: 'center',
-    marginBottom: 32,
-    paddingHorizontal: 16,
   },
   featureIcon: {
     fontSize: 48,
-    marginBottom: 12,
-  },
-  featureTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#1e293b',
-    marginBottom: 8,
     textAlign: 'center',
-  },
-  featureDescription: {
-    fontSize: 14,
-    color: '#64748b',
-    textAlign: 'center',
-    lineHeight: 20,
   },
   actionsContainer: {
     marginBottom: 32,
   },
   primaryButton: {
-    backgroundColor: '#2563eb',
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 12,
     marginBottom: 12,
-    alignItems: 'center',
-  },
-  primaryButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
   },
   secondaryButton: {
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    alignItems: 'center',
+    marginBottom: 12,
   },
-  secondaryButtonText: {
-    color: '#2563eb',
-    fontSize: 16,
-    fontWeight: '500',
+  learnMoreButton: {
+    marginTop: 8,
   },
   footer: {
     alignItems: 'center',
@@ -175,6 +216,20 @@ const styles = StyleSheet.create({
     color: '#94a3b8',
     textAlign: 'center',
     lineHeight: 18,
+  },
+  // Modal styles
+  modalContent: {
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 16,
+    color: '#374151',
+    lineHeight: 24,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  modalButton: {
+    marginTop: 16,
   },
 });
 

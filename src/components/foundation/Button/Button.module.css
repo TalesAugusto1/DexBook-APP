@@ -1,0 +1,175 @@
+/**
+ * Button Component Styles
+ * 
+ * CSS Module styles for the Button component following design tokens.
+ */
+
+/* Design Tokens */
+:root {
+  /* Colors */
+  --color-primary: #2563eb;
+  --color-secondary: #64748b;
+  --color-danger: #ef4444;
+  --color-success: #22c55e;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #94a3b8;
+  --color-background-disabled: #e2e8f0;
+  
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 20px;
+  
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  
+  /* Typography */
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-weight-semibold: 600;
+}
+
+/* Base Button Styles */
+.button {
+  border-radius: var(--radius-md);
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  border-width: 1px;
+  border-color: transparent;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Size Variants */
+.button--small {
+  padding-horizontal: var(--space-md);
+  padding-vertical: var(--space-sm);
+  min-height: 36px;
+}
+
+.button--medium {
+  padding-horizontal: var(--space-lg);
+  padding-vertical: var(--space-md);
+  min-height: 44px;
+}
+
+.button--large {
+  padding-horizontal: var(--space-xl);
+  padding-vertical: var(--space-lg);
+  min-height: 52px;
+}
+
+/* Color Variants */
+.button--primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.button--secondary {
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
+}
+
+.button--danger {
+  background-color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.button--success {
+  background-color: var(--color-success);
+  border-color: var(--color-success);
+}
+
+.button--outline {
+  background-color: transparent;
+  border-color: var(--color-primary);
+}
+
+/* State Variants */
+.buttonDisabled {
+  background-color: var(--color-background-disabled);
+  border-color: var(--color-background-disabled);
+  opacity: 0.6;
+}
+
+.buttonLoading {
+  opacity: 0.8;
+}
+
+/* Text Styles */
+.text {
+  font-weight: var(--font-weight-semibold);
+  text-align: center;
+}
+
+/* Text Size Variants */
+.text--small {
+  font-size: var(--font-size-sm);
+}
+
+.text--medium {
+  font-size: var(--font-size-md);
+}
+
+.text--large {
+  font-size: var(--font-size-lg);
+}
+
+/* Text Color Variants */
+.text--primary,
+.text--secondary,
+.text--danger,
+.text--success {
+  color: var(--color-text-primary);
+}
+
+.text--outline {
+  color: var(--color-primary);
+}
+
+.textDisabled {
+  color: var(--color-text-secondary);
+}
+
+/* Loader Styles */
+.loader {
+  margin-right: var(--space-sm);
+}
+
+/* Accessibility Styles */
+.button:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* AR Theme Support */
+.button[data-ar-theme="overlay"] {
+  background-color: rgba(37, 99, 235, 0.9);
+  backdrop-filter: blur(10px);
+}
+
+/* High Contrast Theme Support */
+.button[data-accessibility-theme="high-contrast"] {
+  border-width: 2px;
+  font-weight: 700;
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+  .button--small {
+    min-height: 40px;
+  }
+  
+  .button--medium {
+    min-height: 48px;
+  }
+  
+  .button--large {
+    min-height: 56px;
+  }
+}
