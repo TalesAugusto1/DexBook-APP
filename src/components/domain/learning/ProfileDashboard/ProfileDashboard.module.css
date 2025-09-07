@@ -1,0 +1,489 @@
+/**
+ * Profile Dashboard Component Styles
+ * Following AlLibrary design system and accessibility guidelines
+ */
+
+.container {
+  flex: 1;
+  background-color: var(--color-background);
+}
+
+.loadingContainer {
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-xl);
+}
+
+.loadingText {
+  margin-top: var(--space-md);
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+/* Tab Navigation */
+.tabNavigation {
+  flex-direction: row;
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: 0 var(--space-md);
+}
+
+.tab {
+  flex: 1;
+  padding: var(--space-md);
+  align-items: center;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.tab:hover {
+  background-color: var(--color-primary-50);
+}
+
+.tab:focus {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+}
+
+.tabActive {
+  border-bottom-color: var(--color-primary-500);
+  background-color: var(--color-primary-50);
+}
+
+.tabText {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.tabTextActive {
+  color: var(--color-primary-700);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Tab Content */
+.tabContent {
+  flex: 1;
+  padding: var(--space-md);
+}
+
+/* Card Styles */
+.summaryCard,
+.chartCard,
+.interestsCard,
+.activityCard,
+.progressCard,
+.goalsCard,
+.efficiencyCard,
+.recommendationCard,
+.emptyCard {
+  margin-bottom: var(--space-lg);
+}
+
+.cardTitle {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-md);
+}
+
+.cardSubtitle {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-lg);
+}
+
+/* Summary Card */
+.summaryHeader {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+}
+
+.summaryGrid {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.summaryItem {
+  flex: 1;
+  min-width: 120px;
+  align-items: center;
+  padding: var(--space-md);
+  background-color: var(--color-gray-50);
+  border-radius: var(--radius-lg);
+}
+
+.summaryLabel {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-xs);
+  text-align: center;
+}
+
+.summaryValue {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  text-align: center;
+}
+
+.primaryStyle {
+  font-weight: var(--font-weight-bold);
+}
+
+/* Learning Styles Chart */
+.chartContainer {
+  gap: var(--space-lg);
+}
+
+.chartItem {
+  gap: var(--space-sm);
+}
+
+.chartLabelContainer {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chartLabel {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.chartScore {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-secondary);
+}
+
+.chartBarContainer {
+  height: 8px;
+  background-color: var(--color-gray-200);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.chartBar {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease;
+}
+
+.chartDescription {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+/* Interests */
+.interestsContainer {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.interestChip {
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--color-primary-100);
+  border-radius: var(--radius-full);
+}
+
+.interestText {
+  font-size: var(--font-size-sm);
+  color: var(--color-primary-700);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Activity */
+.activityItem {
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.activityItem:last-child {
+  border-bottom: none;
+}
+
+.activityText {
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+}
+
+/* Progress Card */
+.streakContainer {
+  align-items: center;
+  margin: var(--space-lg) 0;
+}
+
+.streakNumber {
+  font-size: 3rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-500);
+  line-height: 1;
+}
+
+.streakLabel {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-xs);
+}
+
+.progressBarContainer {
+  height: 12px;
+  background-color: var(--color-gray-200);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin: var(--space-md) 0;
+}
+
+.progressBar {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease;
+}
+
+.progressText {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+/* Goals */
+.goalItem {
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.goalItem:last-child {
+  border-bottom: none;
+}
+
+.goalTitle {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.goalDescription {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-md);
+}
+
+.goalProgressContainer {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.goalProgressBar {
+  flex: 1;
+  height: 8px;
+  background-color: var(--color-gray-200);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.goalProgress {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease;
+}
+
+.goalProgressText {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  min-width: 80px;
+  text-align: right;
+}
+
+/* Efficiency */
+.efficiencyContainer {
+  align-items: center;
+  margin: var(--space-lg) 0;
+}
+
+.efficiencyScore {
+  font-size: 2.5rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-success-500);
+  line-height: 1;
+}
+
+.efficiencyLabel {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-xs);
+}
+
+.efficiencyDescription {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* Recommendations */
+.recommendationsHeader {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-lg);
+  text-align: center;
+}
+
+.recommendationHeader {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-sm);
+}
+
+.recommendationTitle {
+  flex: 1;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-right: var(--space-md);
+}
+
+.recommendationType {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-700);
+  background-color: var(--color-primary-100);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+}
+
+.recommendationDescription {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-md);
+  line-height: 1.4;
+}
+
+.recommendationMeta {
+  flex-direction: row;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.recommendationDuration,
+.recommendationDifficulty,
+.recommendationMatch {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.recommendationReasons {
+  margin-bottom: var(--space-md);
+}
+
+.reasonText {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-xs);
+}
+
+.recommendationButton {
+  margin-top: var(--space-md);
+}
+
+/* Empty States */
+.emptyText {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  text-align: center;
+  line-height: 1.5;
+  margin-bottom: var(--space-lg);
+}
+
+.assessmentButton {
+  margin-top: var(--space-md);
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+  .tabContent {
+    padding: var(--space-xl);
+  }
+  
+  .summaryGrid {
+    gap: var(--space-lg);
+  }
+  
+  .summaryItem {
+    min-width: 150px;
+  }
+  
+  .cardTitle {
+    font-size: var(--font-size-2xl);
+  }
+  
+  .chartContainer {
+    gap: var(--space-xl);
+  }
+}
+
+/* Accessibility Enhancements */
+.tab[aria-selected="true"] {
+  border-bottom-color: var(--color-primary-500);
+  background-color: var(--color-primary-50);
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .tab {
+    border: 2px solid var(--color-border);
+  }
+  
+  .tabActive {
+    border-color: var(--color-primary-500);
+    border-width: 3px;
+  }
+  
+  .chartBar,
+  .progressBar,
+  .goalProgress {
+    border: 1px solid var(--color-text-primary);
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .tab,
+  .chartBar,
+  .progressBar,
+  .goalProgress {
+    transition: none;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .summaryItem {
+    background-color: var(--color-gray-800);
+  }
+  
+  .interestChip {
+    background-color: var(--color-primary-900);
+  }
+  
+  .interestText {
+    color: var(--color-primary-300);
+  }
+  
+  .recommendationType {
+    background-color: var(--color-primary-900);
+    color: var(--color-primary-300);
+  }
+}

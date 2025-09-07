@@ -21,6 +21,12 @@ import {
 import { userReducer, initialUserState } from './userReducer';
 import { userProfileService, UserProfileServiceError } from '../../services/firebase/user';
 import { useAuth } from '../auth/AuthContext';
+import { 
+  learningAnalysisService, 
+  LearningAnalysisError,
+  AssessmentResults,
+  ContentRecommendation 
+} from '../../services/ai/learning';
 
 // Create Enhanced User Context
 const EnhancedUserContext = createContext<UserContextProps | undefined>(undefined);
@@ -176,7 +182,7 @@ export const EnhancedUserProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, [state.currentUser]);
 
   // Learning Profile Functions with Firebase integration
-  const takeLearningAssessment = useCallback(async (): Promise<LearningProfile> => {
+  const processAssessmentResults = useCallback(async (assessmentResults: AssessmentResults): Promise<LearningProfile> => {
     try {
       dispatch({ type: 'SET_ASSESSMENT_IN_PROGRESS', payload: true });
       
@@ -184,71 +190,36 @@ export const EnhancedUserProvider: React.FC<{ children: React.ReactNode }> = ({ 
         throw new Error('No authenticated user');
       }
 
-      // TODO: Replace with actual assessment logic
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Mock assessment results (same as before)
-      const assessmentResults = {
-        visual: Math.floor(Math.random() * 40) + 60,
-        auditory: Math.floor(Math.random() * 40) + 40,
-        kinesthetic: Math.floor(Math.random() * 40) + 30,
-        reading: Math.floor(Math.random() * 40) + 50,
-      };
-      
-      let primaryStyle: LearningProfile['primaryLearningStyle'] = 'visual';
-      let maxScore = assessmentResults.visual;
-      
-      if (assessmentResults.auditory > maxScore) {
-        maxScore = assessmentResults.auditory;
-        primaryStyle = 'auditory';
-      }
-      if (assessmentResults.kinesthetic > maxScore) {
-        maxScore = assessmentResults.kinesthetic;
-        primaryStyle = 'kinesthetic';
-      }
-      if (assessmentResults.reading > maxScore) {
-        maxScore = assessmentResults.reading;
-        primaryStyle = 'reading';
-      }
-      
-      const learningProfile: LearningProfile = {
-        userId: state.currentUser.id,
-        learningStyles: assessmentResults,
-        primaryLearningStyle: primaryStyle,
-        readingLevel: 'intermediate',
-        readingSpeed: Math.floor(Math.random() * 100) + 150,
-        comprehensionLevel: Math.floor(Math.random() * 30) + 70,
-        favoriteGenres: ['Fantasy', 'Science Fiction'],
-        favoriteSubjects: ['Literature', 'Science'],
-        interests: ['Adventure', 'Technology', 'Nature'],
-        dislikedTopics: [],
-        dailyReadingGoal: 30,
-        weeklyBookGoal: 2,
-        currentGoals: [],
-        preferredDifficulty: 'adaptive',
-        timerPreference: false,
-        hintsPreference: true,
-        audioNarrationPreference: primaryStyle === 'auditory',
-        assessmentDate: new Date(),
-        assessmentHistory: [],
-      };
+      // Process assessment results using AI analysis service
+      const learningProfile = await learningAnalysisService.processAssessmentResults(
+        assessmentResults,
+        state.currentUser
+      );
       
       // Save to Firebase
       await userProfileService.saveLearningProfile(learningProfile);
       
       dispatch({ type: 'SET_LEARNING_PROFILE', payload: learningProfile });
-      dispatch({ type: 'ADD_ASSESSMENT_RESULT', payload: assessmentResults });
+      dispatch({ type: 'ADD_ASSESSMENT_RESULT', payload: assessmentResults.learningStyles || assessmentResults });
+      dispatch({ type: 'SET_ASSESSMENT_IN_PROGRESS', payload: false });
       
       return learningProfile;
       
     } catch (error) {
-      const errorMessage = error instanceof UserProfileServiceError 
+      dispatch({ type: 'SET_ASSESSMENT_IN_PROGRESS', payload: false });
+      const errorMessage = error instanceof LearningAnalysisError || error instanceof UserProfileServiceError
         ? error.message 
-        : 'Assessment failed';
+        : 'Assessment processing failed';
       dispatch({ type: 'SET_ERROR', payload: errorMessage });
       throw error;
     }
   }, [state.currentUser]);
+
+  const takeLearningAssessment = useCallback(async (): Promise<LearningProfile> => {
+    // This method is kept for backward compatibility but now throws an error
+    // The new workflow is: UI collects assessment -> processAssessmentResults -> save profile
+    throw new Error('Use processAssessmentResults with assessment data from LearningAssessment component');
+  }, []);
 
   const updateLearningProfile = useCallback(async (updates: Partial<LearningProfile>) => {
     try {
@@ -616,6 +587,56 @@ export const EnhancedUserProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
   }, []);
 
+  // AI-powered content recommendations
+  const getContentRecommendations = useCallback(async (limit: number = 10): Promise<ContentRecommendation[]> => {
+    try {
+      if (!state.learningProfile) {
+        throw new Error('No learning profile available. Please complete the assessment first.');
+      }
+
+      const recommendations = await learningAnalysisService.generateContentRecommendations(
+        state.learningProfile,
+        limit
+      );
+
+      return recommendations;
+    } catch (error) {
+      const errorMessage = error instanceof LearningAnalysisError 
+        ? error.message 
+        : 'Failed to get content recommendations';
+      console.error('Error getting content recommendations:', errorMessage);
+      throw error;
+    }
+  }, [state.learningProfile]);
+
+  // Generate personalized learning path
+  const generateLearningPath = useCallback(async (duration: number = 30) => {
+    try {
+      if (!state.learningProfile || !state.currentUser) {
+        throw new Error('Learning profile and user profile required');
+      }
+
+      const learningPath = await learningAnalysisService.createLearningPath(
+        state.learningProfile,
+        state.currentUser,
+        duration
+      );
+
+      // Store learning path in user profile
+      await userProfileService.updateUserProfile(state.currentUser.id, {
+        learningPath: learningPath.id
+      });
+
+      return learningPath;
+    } catch (error) {
+      const errorMessage = error instanceof LearningAnalysisError 
+        ? error.message 
+        : 'Failed to generate learning path';
+      console.error('Error generating learning path:', errorMessage);
+      throw error;
+    }
+  }, [state.learningProfile, state.currentUser]);
+
   // Social Functions (keep existing mock implementations for now)
   const sendFriendRequest = useCallback(async (userId: string) => {
     try {
@@ -704,8 +725,13 @@ export const EnhancedUserProvider: React.FC<{ children: React.ReactNode }> = ({ 
     
     // Learning Profile Functions
     takeLearningAssessment,
+    processAssessmentResults,
     updateLearningProfile,
     retakeLearningAssessment,
+    
+    // AI-Powered Functions
+    getContentRecommendations,
+    generateLearningPath,
     
     // Settings Functions
     updateAccessibilitySettings,

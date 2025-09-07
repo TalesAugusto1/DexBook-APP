@@ -430,8 +430,13 @@ export interface UserContextProps {
   
   // Learning Profile Functions
   takeLearningAssessment: () => Promise<LearningProfile>;
+  processAssessmentResults: (results: any) => Promise<LearningProfile>; // AssessmentResults type from AI service
   updateLearningProfile: (updates: Partial<LearningProfile>) => Promise<void>;
   retakeLearningAssessment: () => Promise<LearningProfile>;
+  
+  // AI-Powered Functions
+  getContentRecommendations: (limit?: number) => Promise<any[]>; // ContentRecommendation[] type from AI service
+  generateLearningPath: (duration?: number) => Promise<any>; // LearningPath type from AI service
   
   // Settings Functions
   updateAccessibilitySettings: (updates: Partial<AccessibilitySettings>) => Promise<void>;
