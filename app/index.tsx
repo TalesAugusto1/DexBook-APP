@@ -1,16 +1,18 @@
 /**
  * Splash Screen for AR Book Explorer
  * 
- * Initial screen using expo-router navigation.
+ * Initial screen using expo-router navigation with authentication guard.
  * Following AlLibrary coding rules for accessibility-first design and universal access.
  */
 
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
+import React, { useEffect } from 'react';
+import { Animated, StyleSheet, Text, View } from 'react-native';
+import { useAuth } from '../src/stores/auth/AuthContext';
 
 export default function SplashScreen() {
   const router = useRouter();
+  const { state: authState } = useAuth();
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
   const scaleAnim = React.useRef(new Animated.Value(0.8)).current;
 
@@ -29,14 +31,26 @@ export default function SplashScreen() {
         useNativeDriver: true,
       }),
     ]).start();
+  }, [fadeAnim, scaleAnim]);
 
-    // Navigate to welcome screen after 2 seconds
+  // Handle navigation based on authentication state
+  useEffect(() => {
+    // Don't navigate if still loading
+    if (authState.isLoading) {
+      return;
+    }
+
+    // Navigate after a short delay to show splash screen
     const timer = setTimeout(() => {
-      router.replace('/welcome');
-    }, 2000);
+      if (authState.isAuthenticated) {
+        router.replace('/(tabs)');
+      } else {
+        router.replace('/welcome');
+      }
+    }, 1500); // Reduced delay for better UX
 
     return () => clearTimeout(timer);
-  }, [fadeAnim, scaleAnim, router]);
+  }, [authState.isAuthenticated, authState.isLoading, router]);
 
   return (
     <View style={styles.container}>

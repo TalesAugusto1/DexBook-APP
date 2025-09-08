@@ -5,15 +5,23 @@
  * Following AlLibrary coding rules for accessibility-first design and universal access.
  */
 
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Button, Card, Input } from '../../src/components/foundation';
+import React, { useState } from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { AuthGuard, Button, Card, Input } from '../../src/components/foundation';
 import { useAuth } from '../../src/stores/auth/AuthContext';
 
 export default function LoginRegister() {
   const router = useRouter();
-  const { login, register, state } = useAuth();
+  const { login, register, signInWithGoogle, state } = useAuth();
+  
+  // Debug: Check if Google client ID is available
+  React.useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log('Google Client ID available:', !!process.env['EXPO_PUBLIC_GOOGLE_CLIENT_ID']);
+    // eslint-disable-next-line no-console
+    console.log('Google Client ID value:', process.env['EXPO_PUBLIC_GOOGLE_CLIENT_ID']);
+  }, []);
   const [isRegister, setIsRegister] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -65,7 +73,8 @@ export default function LoginRegister() {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <AuthGuard requireAuth={false}>
+      <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>
           {isRegister ? 'Create Account' : 'Welcome Back!'}
@@ -169,6 +178,18 @@ export default function LoginRegister() {
           />
         </View>
 
+        <View style={styles.socialSection}>
+          <Button
+            title="Sign in with Google"
+            onPress={signInWithGoogle}
+            variant="outline"
+            size="large"
+            style={styles.socialButton}
+            loading={state.isLoading}
+            disabled={state.isLoading}
+          />
+        </View>
+
         <View style={styles.skipSection}>
           <Button
             title="Continue as Guest"
@@ -186,6 +207,7 @@ export default function LoginRegister() {
         )}
       </View>
     </ScrollView>
+    </AuthGuard>
   );
 }
 
@@ -243,6 +265,13 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   skipButton: {
+    width: '80%',
+  },
+  socialSection: {
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  socialButton: {
     width: '80%',
   },
   errorContainer: {

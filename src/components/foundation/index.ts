@@ -6,23 +6,35 @@
 
 // Button Component
 export { Button } from './Button';
-export type { ButtonProps, ButtonVariant, ButtonSize } from './Button/types';
+export type { ButtonProps, ButtonSize, ButtonVariant } from './Button/types';
 
 // Input Component
 export { Input } from './Input';
-export type { InputProps, InputVariant, InputSize } from './Input/types';
+export type { InputProps, InputSize, InputVariant } from './Input/types';
 
 // Card Component
 export { Card } from './Card';
-export type { CardProps, CardVariant, CardSize } from './Card/types';
+export type { CardProps, CardSize, CardVariant } from './Card/types';
 
 // Loading Component
 export { Loading } from './Loading';
-export type { LoadingProps, LoadingVariant, LoadingSize } from './Loading/types';
+export type { LoadingProps, LoadingSize, LoadingVariant } from './Loading/types';
 
 // Modal Component
 export { Modal } from './Modal';
-export type { ModalProps, ModalVariant, ModalSize } from './Modal/types';
+export type { ModalProps, ModalSize, ModalVariant } from './Modal/types';
+
+// AuthGuard Component
+export { AuthGuard } from './AuthGuard';
+
+// AuthStateManager Component
+export { AuthStateManager } from './AuthStateManager';
+
+// AuthDebugger Component (Development only)
+export { AuthDebugger } from './AuthDebugger';
+
+// AuthStatusIndicator Component (Development only)
+export { AuthStatusIndicator } from './AuthStatusIndicator';
 
 // Typography Component (to be implemented)
 // export { Typography } from './Typography';

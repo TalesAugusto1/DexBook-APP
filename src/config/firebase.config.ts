@@ -5,13 +5,13 @@
  * Following AlLibrary coding rules for security-first architecture and COPPA compliance.
  */
 
-import { initializeApp } from 'firebase/app';
-import { getAuth, initializeAuth, getReactNativePersistence } from 'firebase/auth';
-import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
-import { getStorage, connectStorageEmulator } from 'firebase/storage';
-import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
 import { getAnalytics } from 'firebase/analytics';
+import { initializeApp } from 'firebase/app';
+import { getReactNativePersistence, initializeAuth } from 'firebase/auth';
+import { connectFirestoreEmulator, initializeFirestore } from 'firebase/firestore';
+import { connectFunctionsEmulator, getFunctions } from 'firebase/functions';
 import { getPerformance } from 'firebase/performance';
+import { connectStorageEmulator, getStorage } from 'firebase/storage';
 // import { getCrashlytics } from 'firebase/crashlytics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
@@ -19,30 +19,27 @@ import { Platform } from 'react-native';
 // Firebase configuration object
 // Using actual Firebase project configuration from google-services.json
 const firebaseConfig = {
-  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY || "AIzaSyBLqIR2i2MRo0kPGtuIRdirRR2TcryxLdw",
-  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN || "dexbook-3899d.firebaseapp.com",
-  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID || "dexbook-3899d",
-  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET || "dexbook-3899d.firebasestorage.app",
-  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "721919310516",
-  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID || "1:721919310516:android:68ecac78fe74de42f5b5e1",
-  measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID || ""
+  apiKey: "AIzaSyBLqIR2i2MRo0kPGtuIRdirRR2TcryxLdw",
+  authDomain: "dexbook-3899d.firebaseapp.com",
+  projectId: "dexbook-3899d",
+  storageBucket: "dexbook-3899d.firebasestorage.app",
+  messagingSenderId: "721919310516",
+  appId: "1:721919310516:android:68ecac78fe74de42f5b5e1",
+  measurementId: "" // Add this if you have Google Analytics enabled
 };
 
 // Initialize Firebase app
 const app = initializeApp(firebaseConfig);
 
-// Initialize Firebase Auth with AsyncStorage persistence
-let auth: any;
-if (Platform.OS === 'web') {
-  auth = getAuth(app);
-} else {
-  auth = initializeAuth(app, {
-    persistence: getReactNativePersistence(AsyncStorage)
-  });
-}
+// Initialize Firebase Auth with persistence (React Native)
+const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(AsyncStorage),
+});
 
-// Initialize Firestore
-const firestore = getFirestore(app);
+// Initialize Firestore with RN-friendly networking (auto long polling)
+const firestore = initializeFirestore(app, {
+  experimentalAutoDetectLongPolling: true,
+});
 
 // Initialize Storage
 const storage = getStorage(app);
@@ -69,12 +66,14 @@ let crashlytics: any = null;
 // }
 
 // Development environment setup
-if (__DEV__) {
-  // Connect to Firebase emulators in development
+if (__DEV__ && process.env['EXPO_PUBLIC_USE_FIREBASE_EMULATORS'] === 'true') {
+  // Use platform-aware host for Android emulator; allow override via env
+  const EMULATOR_HOST = process.env['EXPO_PUBLIC_EMULATOR_HOST'] || (Platform.OS === 'android' ? '10.0.2.2' : 'localhost');
+
   try {
-    connectFirestoreEmulator(firestore, 'localhost', 8080);
-    connectStorageEmulator(storage, 'localhost', 9199);
-    connectFunctionsEmulator(functions, 'localhost', 5001);
+    connectFirestoreEmulator(firestore, EMULATOR_HOST, 8080);
+    connectStorageEmulator(storage, EMULATOR_HOST, 9199);
+    connectFunctionsEmulator(functions, EMULATOR_HOST, 5001);
   } catch (error) {
     // Emulators already connected or not available
     // eslint-disable-next-line no-console
@@ -84,18 +83,12 @@ if (__DEV__) {
 
 // Export Firebase services
 export {
-  app,
-  auth,
-  firestore,
-  storage,
-  functions,
-  analytics,
-  performance,
-  crashlytics
+    analytics, app,
+    auth, crashlytics, firestore, functions, performance, storage
 };
 
 // Export configuration for other modules
-export { firebaseConfig };
+    export { firebaseConfig };
 
 // Firebase service types
 export interface FirebaseServices {

@@ -5,10 +5,10 @@
  * Following AlLibrary coding rules for accessibility-first design and universal access.
  */
 
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Button, Card, Input } from '../../src/components/foundation';
+import React, { useState } from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { AuthGuard, Button, Card, Input } from '../../src/components/foundation';
 
 export default function ProfileSetup() {
   const router = useRouter();
@@ -31,7 +31,8 @@ export default function ProfileSetup() {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <AuthGuard requireAuth={true}>
+      <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Complete Your Profile</Text>
         <Text style={styles.subtitle}>
@@ -129,6 +130,7 @@ export default function ProfileSetup() {
         </View>
       </View>
     </ScrollView>
+    </AuthGuard>
   );
 }
 
