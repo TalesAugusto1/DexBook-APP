@@ -57,7 +57,7 @@ export const ProfileSetup: React.FC = () => {
               onChangeText={(value) => handleInputChange('name', value)}
               variant="outline"
               size="medium"
-              style={styles.input}
+              containerStyle={styles.input}
             />
 
             <Input
@@ -67,7 +67,7 @@ export const ProfileSetup: React.FC = () => {
               onChangeText={(value) => handleInputChange('email', value)}
               variant="outline"
               size="medium"
-              style={styles.input}
+              containerStyle={styles.input}
             />
 
             <Input
@@ -77,7 +77,7 @@ export const ProfileSetup: React.FC = () => {
               onChangeText={(value) => handleInputChange('age', value)}
               variant="outline"
               size="medium"
-              style={styles.input}
+              containerStyle={styles.input}
             />
 
             <Input
@@ -87,7 +87,7 @@ export const ProfileSetup: React.FC = () => {
               onChangeText={(value) => handleInputChange('grade', value)}
               variant="outline"
               size="medium"
-              style={styles.input}
+              containerStyle={styles.input}
             />
           </View>
         </Card>

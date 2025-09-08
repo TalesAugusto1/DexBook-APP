@@ -568,6 +568,124 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
+  // AI-Powered Functions
+  const processAssessmentResults = useCallback(async (results: any): Promise<LearningProfile> => {
+    try {
+      dispatch({ type: 'SET_ASSESSMENT_IN_PROGRESS', payload: true });
+      
+      // TODO: Replace with actual AI processing logic
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Process assessment results and create learning profile
+      const learningProfile: LearningProfile = {
+        userId: state.currentUser?.id || '',
+        learningStyles: results.learningStyles || {
+          visual: Math.floor(Math.random() * 40) + 60,
+          auditory: Math.floor(Math.random() * 40) + 40,
+          kinesthetic: Math.floor(Math.random() * 40) + 30,
+          reading: Math.floor(Math.random() * 40) + 50,
+        },
+        primaryLearningStyle: results.primaryLearningStyle || 'visual',
+        readingLevel: results.readingLevel || 'intermediate',
+        readingSpeed: results.readingSpeed || Math.floor(Math.random() * 100) + 150,
+        comprehensionLevel: results.comprehensionLevel || Math.floor(Math.random() * 30) + 70,
+        favoriteGenres: results.favoriteGenres || ['Fantasy', 'Science Fiction'],
+        favoriteSubjects: results.favoriteSubjects || ['Literature', 'Science'],
+        interests: results.interests || ['Adventure', 'Technology', 'Nature'],
+        dislikedTopics: results.dislikedTopics || [],
+        dailyReadingGoal: results.dailyReadingGoal || 30,
+        weeklyBookGoal: results.weeklyBookGoal || 2,
+        currentGoals: results.currentGoals || [],
+        preferredDifficulty: results.preferredDifficulty || 'adaptive',
+        timerPreference: results.timerPreference || false,
+        hintsPreference: results.hintsPreference || true,
+        audioNarrationPreference: results.audioNarrationPreference || false,
+        assessmentDate: new Date(),
+        assessmentHistory: [],
+      };
+      
+      dispatch({ type: 'SET_LEARNING_PROFILE', payload: learningProfile });
+      dispatch({ type: 'ADD_ASSESSMENT_RESULT', payload: results });
+      dispatch({ type: 'SET_ASSESSMENT_IN_PROGRESS', payload: false });
+      
+      return learningProfile;
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to process assessment results';
+      dispatch({ type: 'SET_ERROR', payload: errorMessage });
+      dispatch({ type: 'SET_ASSESSMENT_IN_PROGRESS', payload: false });
+      throw error;
+    }
+  }, [state.currentUser?.id]);
+
+  const getContentRecommendations = useCallback(async (limit: number = 10): Promise<any[]> => {
+    try {
+      // TODO: Replace with actual AI recommendation logic
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Mock content recommendations based on learning profile
+      const mockRecommendations = Array.from({ length: limit }, (_, index) => ({
+        id: `rec_${index + 1}`,
+        type: 'book',
+        title: `Recommended Book ${index + 1}`,
+        author: `Author ${index + 1}`,
+        genre: state.learningProfile?.favoriteGenres[0] || 'Fantasy',
+        difficulty: state.learningProfile?.preferredDifficulty || 'adaptive',
+        learningStyle: state.learningProfile?.primaryLearningStyle || 'visual',
+        estimatedTime: Math.floor(Math.random() * 60) + 30, // 30-90 minutes
+        arContentAvailable: Math.random() > 0.5,
+        rating: Math.floor(Math.random() * 2) + 4, // 4-5 stars
+        reason: `Matches your ${state.learningProfile?.primaryLearningStyle || 'visual'} learning style`,
+      }));
+      
+      return mockRecommendations;
+      
+    } catch (error) {
+      console.error('Failed to get content recommendations:', error);
+      return [];
+    }
+  }, [state.learningProfile]);
+
+  const generateLearningPath = useCallback(async (duration: number = 30): Promise<any> => {
+    try {
+      // TODO: Replace with actual AI learning path generation
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Mock learning path based on user profile and duration
+      const mockLearningPath = {
+        id: `path_${Date.now()}`,
+        userId: state.currentUser?.id || '',
+        title: `${duration}-Day Learning Journey`,
+        description: `Personalized learning path for ${duration} days`,
+        duration: duration,
+        difficulty: state.learningProfile?.preferredDifficulty || 'adaptive',
+        learningStyle: state.learningProfile?.primaryLearningStyle || 'visual',
+        goals: state.learningProfile?.currentGoals || [],
+        milestones: Array.from({ length: Math.ceil(duration / 7) }, (_, index) => ({
+          id: `milestone_${index + 1}`,
+          title: `Week ${index + 1} Milestone`,
+          description: `Complete ${index + 1} books and take ${(index + 1) * 2} quizzes`,
+          targetDate: new Date(Date.now() + (index + 1) * 7 * 24 * 60 * 60 * 1000),
+          isCompleted: false,
+        })),
+        resources: state.learningProfile?.favoriteGenres.slice(0, 3).map(genre => ({
+          type: 'book',
+          title: `Recommended ${genre} Book`,
+          genre: genre,
+          estimatedTime: 60,
+        })),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      
+      return mockLearningPath;
+      
+    } catch (error) {
+      console.error('Failed to generate learning path:', error);
+      throw error;
+    }
+  }, [state.currentUser?.id, state.learningProfile]);
+
   // Context value
   const contextValue: UserContextProps = {
     state,
@@ -580,8 +698,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     // Learning Profile Functions
     takeLearningAssessment,
+    processAssessmentResults,
     updateLearningProfile,
     retakeLearningAssessment,
+    
+    // AI-Powered Functions
+    getContentRecommendations,
+    generateLearningPath,
     
     // Settings Functions
     updateAccessibilitySettings,

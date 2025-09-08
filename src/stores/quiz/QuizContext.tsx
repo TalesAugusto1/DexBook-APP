@@ -24,7 +24,7 @@ const QuizContext = createContext<QuizContextProps | undefined>(undefined);
 // Quiz Provider Component
 export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(quizReducer, initialQuizState);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<number | null>(null);
 
   // Quiz Generation Functions
   const generateQuiz = useCallback(async (params: QuizGenerationParams) => {
@@ -56,7 +56,7 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
           correctAnswer: 0,
           explanation: 'The book primarily focuses on adventure and exploration.',
           difficulty: 'medium',
-          learningStyle: params.learningStyle,
+          learningStyle: params.learningStyle === 'mixed' ? 'universal' : params.learningStyle,
           keyConceptsTargeted: ['theme', 'analysis'],
           estimatedTimeSeconds: 60,
           screenReaderText: 'Multiple choice question about the main theme of the book',
@@ -70,7 +70,7 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
           correctAnswer: 1,
           explanation: 'Character B demonstrates significant personal growth and development.',
           difficulty: 'hard',
-          learningStyle: params.learningStyle,
+          learningStyle: params.learningStyle === 'mixed' ? 'universal' : params.learningStyle,
           keyConceptsTargeted: ['character development', 'analysis'],
           estimatedTimeSeconds: 90,
           screenReaderText: 'Multiple choice question about character development',

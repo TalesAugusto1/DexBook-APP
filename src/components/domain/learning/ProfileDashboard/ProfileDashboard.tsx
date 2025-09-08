@@ -7,13 +7,12 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, Pressable, Dimensions } from 'react-native';
+import { View, Text, ScrollView, Pressable, Dimensions, StyleSheet } from 'react-native';
 import { Card } from '../../../foundation/Card/Card';
 import { Button } from '../../../foundation/Button/Button';
 import { Loading } from '../../../foundation/Loading/Loading';
 import { LearningProfile, UserStatistics } from '../../../../stores/user/types';
 import { ContentRecommendation } from '../../../../services/ai/learning/learningAnalysisService';
-import styles from './ProfileDashboard.module.css';
 
 export interface ProfileDashboardProps {
   learningProfile: LearningProfile;
@@ -236,28 +235,34 @@ export const ProfileDashboard: React.FC<ProfileDashboardProps> = ({
       <Card style={styles.goalsCard}>
         <Text style={styles.cardTitle}>Current Goals</Text>
         {learningProfile.currentGoals && learningProfile.currentGoals.length > 0 ? (
-          learningProfile.currentGoals.map((goal) => (
-            <View key={goal.id} style={styles.goalItem}>
-              <Text style={styles.goalTitle}>{goal.title}</Text>
-              <Text style={styles.goalDescription}>{goal.description}</Text>
-              <View style={styles.goalProgressContainer}>
-                <View style={styles.goalProgressBar}>
-                  <View
-                    style={[
-                      styles.goalProgress,
-                      {
-                        width: `${(goal.currentValue / goal.targetValue) * 100}%`,
-                        backgroundColor: getProgressColor((goal.currentValue / goal.targetValue) * 100),
-                      },
-                    ]}
-                  />
+          learningProfile.currentGoals.map((goal, index) => {
+            const goalTitle = goal.type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+            const goalDescription = `Target: ${goal.target} by ${goal.deadline.toLocaleDateString()}`;
+            const progressPercentage = (goal.progress / goal.target) * 100;
+            
+            return (
+              <View key={`${goal.type}-${index}`} style={styles.goalItem}>
+                <Text style={styles.goalTitle}>{goalTitle}</Text>
+                <Text style={styles.goalDescription}>{goalDescription}</Text>
+                <View style={styles.goalProgressContainer}>
+                  <View style={styles.goalProgressBar}>
+                    <View
+                      style={[
+                        styles.goalProgress,
+                        {
+                          width: `${Math.min(progressPercentage, 100)}%`,
+                          backgroundColor: getProgressColor(progressPercentage),
+                        },
+                      ]}
+                    />
+                  </View>
+                  <Text style={styles.goalProgressText}>
+                    {goal.progress} / {goal.target}
+                  </Text>
                 </View>
-                <Text style={styles.goalProgressText}>
-                  {goal.currentValue} / {goal.targetValue} {goal.unit}
-                </Text>
               </View>
-            </View>
-          ))
+            );
+          })
         ) : (
           <Text style={styles.emptyText}>No active goals. Take the assessment to get personalized goals!</Text>
         )}
@@ -378,3 +383,337 @@ export const ProfileDashboard: React.FC<ProfileDashboardProps> = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8fafc',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#64748b',
+  },
+  tabNavigation: {
+    flexDirection: 'row',
+    backgroundColor: '#ffffff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  tabActive: {
+    borderBottomColor: '#3b82f6',
+  },
+  tabText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#64748b',
+  },
+  tabTextActive: {
+    color: '#3b82f6',
+  },
+  tabContent: {
+    flex: 1,
+    padding: 16,
+  },
+  summaryCard: {
+    marginBottom: 16,
+  },
+  summaryHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1e293b',
+    marginBottom: 8,
+  },
+  cardSubtitle: {
+    fontSize: 14,
+    color: '#64748b',
+    marginBottom: 16,
+  },
+  primaryStyle: {
+    fontWeight: '600',
+  },
+  summaryGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  summaryItem: {
+    flex: 1,
+    minWidth: '45%',
+    padding: 12,
+    backgroundColor: '#f8fafc',
+    borderRadius: 8,
+  },
+  summaryLabel: {
+    fontSize: 12,
+    color: '#64748b',
+    marginBottom: 4,
+  },
+  summaryValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1e293b',
+  },
+  chartCard: {
+    marginBottom: 16,
+  },
+  chartContainer: {
+    marginTop: 16,
+  },
+  chartItem: {
+    marginBottom: 16,
+  },
+  chartLabelContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  chartLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#1e293b',
+  },
+  chartScore: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#64748b',
+  },
+  chartBarContainer: {
+    height: 8,
+    backgroundColor: '#e2e8f0',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  chartBar: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  chartDescription: {
+    fontSize: 12,
+    color: '#64748b',
+    marginTop: 4,
+  },
+  interestsCard: {
+    marginBottom: 16,
+  },
+  interestsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  interestChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: '#dbeafe',
+    borderRadius: 16,
+  },
+  interestText: {
+    fontSize: 12,
+    color: '#1e40af',
+    fontWeight: '500',
+  },
+  activityCard: {
+    marginBottom: 16,
+  },
+  activityItem: {
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+  },
+  activityText: {
+    fontSize: 14,
+    color: '#64748b',
+  },
+  progressCard: {
+    marginBottom: 16,
+  },
+  streakContainer: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    marginBottom: 16,
+  },
+  streakNumber: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#3b82f6',
+  },
+  streakLabel: {
+    fontSize: 16,
+    color: '#64748b',
+    marginLeft: 4,
+  },
+  progressBarContainer: {
+    height: 8,
+    backgroundColor: '#e2e8f0',
+    borderRadius: 4,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  progressBar: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  progressText: {
+    fontSize: 12,
+    color: '#64748b',
+  },
+  goalsCard: {
+    marginBottom: 16,
+  },
+  goalItem: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+  },
+  goalTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1e293b',
+    marginBottom: 4,
+  },
+  goalDescription: {
+    fontSize: 12,
+    color: '#64748b',
+    marginBottom: 8,
+  },
+  goalProgressContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  goalProgressBar: {
+    flex: 1,
+    height: 6,
+    backgroundColor: '#e2e8f0',
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  goalProgress: {
+    height: '100%',
+    borderRadius: 3,
+  },
+  goalProgressText: {
+    fontSize: 12,
+    color: '#64748b',
+    fontWeight: '500',
+  },
+  efficiencyCard: {
+    marginBottom: 16,
+  },
+  efficiencyContainer: {
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  efficiencyScore: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#10b981',
+  },
+  efficiencyLabel: {
+    fontSize: 14,
+    color: '#64748b',
+  },
+  efficiencyDescription: {
+    fontSize: 12,
+    color: '#64748b',
+    textAlign: 'center',
+  },
+  recommendationsHeader: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#1e293b',
+    marginBottom: 16,
+  },
+  recommendationCard: {
+    marginBottom: 16,
+  },
+  recommendationHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  recommendationTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1e293b',
+    flex: 1,
+  },
+  recommendationType: {
+    fontSize: 10,
+    color: '#3b82f6',
+    backgroundColor: '#dbeafe',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    fontWeight: '600',
+  },
+  recommendationDescription: {
+    fontSize: 14,
+    color: '#64748b',
+    marginBottom: 12,
+  },
+  recommendationMeta: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 12,
+  },
+  recommendationDuration: {
+    fontSize: 12,
+    color: '#64748b',
+  },
+  recommendationDifficulty: {
+    fontSize: 12,
+    color: '#64748b',
+  },
+  recommendationMatch: {
+    fontSize: 12,
+    color: '#10b981',
+    fontWeight: '500',
+  },
+  recommendationReasons: {
+    marginBottom: 16,
+  },
+  reasonText: {
+    fontSize: 12,
+    color: '#64748b',
+    marginBottom: 4,
+  },
+  recommendationButton: {
+    alignSelf: 'flex-start',
+  },
+  emptyCard: {
+    alignItems: 'center',
+    padding: 32,
+  },
+  emptyText: {
+    fontSize: 14,
+    color: '#64748b',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  assessmentButton: {
+    alignSelf: 'center',
+  },
+});

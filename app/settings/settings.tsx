@@ -23,7 +23,7 @@ import { useEnhancedUser } from '../../src/stores/user/EnhancedUserContext';
 
 export default function Settings() {
   const { state: authState, logout } = useAuth();
-  const { state: userState, updateSettings } = useEnhancedUser();
+  const { state: userState } = useEnhancedUser();
   
   const [settings, setSettings] = useState({
     notifications: true,
@@ -72,7 +72,7 @@ export default function Settings() {
   const handleSettingChange = (key: string, value: any) => {
     const newSettings = { ...settings, [key]: value };
     setSettings(newSettings);
-    updateSettings(newSettings);
+    // TODO: Implement settings update
   };
 
   const showHelp = () => {

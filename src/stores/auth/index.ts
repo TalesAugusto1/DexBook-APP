@@ -6,5 +6,5 @@
 
 export { AuthProvider, useAuth } from './AuthContext';
 export { authReducer } from './authStore';
-export * from './authStore';
+export type { AuthAction } from './authStore';
 export * from './authTypes';

@@ -87,15 +87,15 @@ export const Input: React.FC<InputProps> = ({
     containerStyle,
   ];
 
-  const inputStyles = [
+  const inputStyles: TextStyle[] = [
     styles.input,
-    styles[`input--${variant}`],
-    styles[`input--${size}`],
+    styles[`input--${variant}` as keyof typeof styles] as TextStyle,
+    styles[`input--${size}` as keyof typeof styles] as TextStyle,
     leftIcon && styles.inputWithLeftIcon,
     rightIcon && styles.inputWithRightIcon,
     disabled && styles.inputDisabled,
     inputStyle,
-  ];
+  ].filter(Boolean) as TextStyle[];
 
   const labelStyles = [
     styles.label,
@@ -137,7 +137,6 @@ export const Input: React.FC<InputProps> = ({
           accessibilityHint={helperText}
           accessibilityState={{
             disabled,
-            invalid: !!error,
           }}
           {...textInputProps}
         />

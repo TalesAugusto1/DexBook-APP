@@ -103,19 +103,19 @@ export default function HomeScreen() {
         >
           <View style={styles.statsGrid}>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{userState.statistics?.booksRead || 0}</Text>
+              <Text style={styles.statNumber}>{userState.userStatistics?.totalBooksRead || 0}</Text>
               <Text style={styles.statLabel}>Books Read</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{userState.statistics?.readingStreak || 0}</Text>
+              <Text style={styles.statNumber}>{userState.userStatistics?.currentReadingStreak || 0}</Text>
               <Text style={styles.statLabel}>Day Streak</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{userState.statistics?.totalReadingTime || 0}</Text>
+              <Text style={styles.statNumber}>{Math.round((userState.userStatistics?.totalReadingTime || 0) / 60)}</Text>
               <Text style={styles.statLabel}>Hours Read</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{userState.statistics?.averageScore || 0}%</Text>
+              <Text style={styles.statNumber}>{Math.round(userState.userStatistics?.averageQuizScore || 0)}%</Text>
               <Text style={styles.statLabel}>Avg Score</Text>
             </View>
           </View>
@@ -129,19 +129,19 @@ export default function HomeScreen() {
           size="medium"
           style={styles.recentBooksCard}
         >
-          {bookState.recentBooks?.length > 0 ? (
+          {bookState.library.recentBooks?.length > 0 ? (
             <View style={styles.recentBooksList}>
-              {bookState.recentBooks.slice(0, 3).map((book, index) => (
+              {bookState.library.recentBooks.slice(0, 3).map((book, index) => (
                 <View key={index} style={styles.recentBookItem}>
                   <Image
-                    source={{ uri: book.coverImage || 'https://via.placeholder.com/60' }}
+                    source={{ uri: book.coverUrl || 'https://via.placeholder.com/60' }}
                     style={styles.bookCover}
                   />
                   <View style={styles.bookInfo}>
                     <Text style={styles.bookTitle}>{book.title}</Text>
                     <Text style={styles.bookAuthor}>{book.author}</Text>
                     <Text style={styles.bookProgress}>
-                      {book.progress || 0}% complete
+                      {bookState.progress[book.id]?.progressPercentage || 0}% complete
                     </Text>
                   </View>
                 </View>
@@ -171,11 +171,11 @@ export default function HomeScreen() {
           style={styles.recommendationsCard}
         >
           <View style={styles.recommendationsList}>
-            {userState.recommendations?.length > 0 ? (
-              userState.recommendations.slice(0, 4).map((recommendation, index) => (
+            {bookState.library.recommendations?.length > 0 ? (
+              bookState.library.recommendations.slice(0, 4).map((recommendation, index) => (
                 <View key={index} style={styles.recommendationItem}>
                   <Text style={styles.recommendationTitle}>{recommendation.title}</Text>
-                  <Text style={styles.recommendationReason}>{recommendation.reason}</Text>
+                  <Text style={styles.recommendationReason}>by {recommendation.author}</Text>
                 </View>
               ))
             ) : (
@@ -238,19 +238,19 @@ export default function HomeScreen() {
             <View style={styles.challengeItem}>
               <Text style={styles.challengeTitle}>📚 Read 5 Books This Month</Text>
               <Text style={styles.challengeProgress}>
-                {userState.statistics?.booksReadThisMonth || 0}/5 books
+                {userState.userStatistics?.totalBooksRead || 0}/5 books
               </Text>
             </View>
             <View style={styles.challengeItem}>
               <Text style={styles.challengeTitle}>🔥 30-Day Reading Streak</Text>
               <Text style={styles.challengeProgress}>
-                {userState.statistics?.readingStreak || 0}/30 days
+                {userState.userStatistics?.currentReadingStreak || 0}/30 days
               </Text>
             </View>
             <View style={styles.challengeItem}>
               <Text style={styles.challengeTitle}>🎯 Perfect Quiz Score</Text>
               <Text style={styles.challengeProgress}>
-                {userState.statistics?.perfectScores || 0}/10 quizzes
+                {userState.userStatistics?.totalQuizzesTaken || 0}/10 quizzes
               </Text>
             </View>
           </View>

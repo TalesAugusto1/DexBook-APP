@@ -135,8 +135,8 @@ export class AuthService {
       }
 
       // Fallback: initiate AuthSession to obtain id_token
-      const redirectUri = makeRedirectUri({ useProxy: true });
-      const clientId = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || '';
+      const redirectUri = makeRedirectUri();
+      const clientId = process.env['EXPO_PUBLIC_GOOGLE_CLIENT_ID'] || '';
       const discovery = {
         authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
         tokenEndpoint: 'https://oauth2.googleapis.com/token',

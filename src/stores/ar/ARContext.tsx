@@ -25,7 +25,7 @@ const ARContext = createContext<ARContextProps | undefined>(undefined);
 // AR Provider Component
 export const ARProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(arReducer, initialARState);
-  const performanceMonitorRef = useRef<NodeJS.Timeout | null>(null);
+  const performanceMonitorRef = useRef<number | null>(null);
 
   // Camera Functions
   const initializeCamera = useCallback(async () => {

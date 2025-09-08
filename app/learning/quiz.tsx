@@ -97,10 +97,10 @@ export default function AdaptiveQuiz() {
           size="large"
           style={styles.questionCard}
         >
-          <Text style={styles.questionText}>{currentQ.question}</Text>
+          <Text style={styles.questionText}>{currentQ?.question}</Text>
           
           <View style={styles.optionsContainer}>
-            {currentQ.options.map((option, index) => (
+            {currentQ?.options.map((option, index) => (
               <Button
                 key={index}
                 title={option}

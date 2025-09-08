@@ -220,7 +220,7 @@ export const GamificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         redeemedAt: new Date(),
         status: reward.category === 'digital' ? 'fulfilled' : 'pending',
         fulfillmentMethod: reward.category === 'digital' ? 'automatic' : 'manual',
-        completedAt: reward.category === 'digital' ? new Date() : undefined,
+        ...(reward.category === 'digital' && { completedAt: new Date() }),
       };
       
       // Spend points

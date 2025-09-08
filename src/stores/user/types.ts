@@ -44,6 +44,9 @@ export interface UserProfile {
   isVerified: boolean;
   subscriptionType: 'free' | 'premium' | 'school';
   subscriptionExpiresAt?: Date;
+  
+  // Learning path reference
+  learningPath?: string;
 }
 
 // Learning Profile Types

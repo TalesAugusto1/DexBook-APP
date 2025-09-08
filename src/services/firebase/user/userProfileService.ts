@@ -72,8 +72,8 @@ export class UserProfileService {
         const data = userDoc.data();
         return {
           ...data,
-          createdAt: data.createdAt?.toDate() || new Date(),
-          lastLoginAt: data.lastLoginAt?.toDate() || new Date(),
+          createdAt: data['createdAt']?.toDate() || new Date(),
+          lastLoginAt: data['lastLoginAt']?.toDate() || new Date(),
         } as UserProfile;
       }
       
@@ -178,9 +178,9 @@ export class UserProfileService {
         const data = learningDoc.data();
         return {
           ...data,
-          assessmentDate: data.assessmentDate?.toDate() || new Date(),
-          lastReassessment: data.lastReassessment?.toDate(),
-          assessmentHistory: data.assessmentHistory?.map((item: any) => ({
+          assessmentDate: data['assessmentDate']?.toDate() || new Date(),
+          lastReassessment: data['lastReassessment']?.toDate(),
+          assessmentHistory: data['assessmentHistory']?.map((item: any) => ({
             ...item,
             date: item.date?.toDate() || new Date(),
           })) || [],
@@ -236,7 +236,7 @@ export class UserProfileService {
         const data = settingsDoc.data();
         return {
           ...data,
-          lastUpdated: data.lastUpdated?.toDate() || new Date(),
+          lastUpdated: data['lastUpdated']?.toDate() || new Date(),
         } as AccessibilitySettings;
       }
       
@@ -288,8 +288,8 @@ export class UserProfileService {
         const data = settingsDoc.data();
         return {
           ...data,
-          lastUpdated: data.lastUpdated?.toDate() || new Date(),
-          accountDeletionDate: data.accountDeletionDate?.toDate(),
+          lastUpdated: data['lastUpdated']?.toDate() || new Date(),
+          accountDeletionDate: data['accountDeletionDate']?.toDate(),
         } as PrivacySettings;
       }
       
@@ -341,7 +341,7 @@ export class UserProfileService {
         const data = prefsDoc.data();
         return {
           ...data,
-          lastUpdated: data.lastUpdated?.toDate() || new Date(),
+          lastUpdated: data['lastUpdated']?.toDate() || new Date(),
         } as NotificationPreferences;
       }
       
@@ -393,8 +393,8 @@ export class UserProfileService {
         const data = statsDoc.data();
         return {
           ...data,
-          lastActiveDate: data.lastActiveDate?.toDate() || new Date(),
-          lastCalculated: data.lastCalculated?.toDate() || new Date(),
+          lastActiveDate: data['lastActiveDate']?.toDate() || new Date(),
+          lastCalculated: data['lastCalculated']?.toDate() || new Date(),
         } as UserStatistics;
       }
       
@@ -453,8 +453,8 @@ export class UserProfileService {
         const data = doc.data();
         users.push({
           ...data,
-          createdAt: data.createdAt?.toDate() || new Date(),
-          lastLoginAt: data.lastLoginAt?.toDate() || new Date(),
+          createdAt: data['createdAt']?.toDate() || new Date(),
+          lastLoginAt: data['lastLoginAt']?.toDate() || new Date(),
         } as UserProfile);
       });
       

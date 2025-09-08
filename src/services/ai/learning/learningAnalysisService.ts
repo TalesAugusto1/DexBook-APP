@@ -8,11 +8,25 @@
 
 import { 
   LearningProfile, 
-  UserProfile,
-  LearningStyles,
-  ReadingLevel,
-  LearningGoal 
+  UserProfile
 } from '../../../stores/user/types';
+
+// Learning Goal Interface
+export interface LearningGoal {
+  id: string;
+  type: 'reading' | 'comprehension' | 'vocabulary' | 'speed';
+  title: string;
+  description: string;
+  targetValue: number;
+  currentValue: number;
+  unit: string;
+  deadline: Date;
+  isActive: boolean;
+  createdAt: Date;
+}
+
+// Reading Level Type
+export type ReadingLevel = 'beginner' | 'intermediate' | 'advanced';
 
 // Assessment Results Interface (from LearningAssessment component)
 export interface AssessmentResults {
@@ -21,7 +35,7 @@ export interface AssessmentResults {
   kinesthetic: number;
   reading: number;
   primaryLearningStyle: 'visual' | 'auditory' | 'kinesthetic' | 'reading';
-  readingLevel: 'beginner' | 'intermediate' | 'advanced';
+  readingLevel: ReadingLevel;
   interests: string[];
 }
 
@@ -47,7 +61,12 @@ export interface LearningPath {
   description: string;
   estimatedDuration: number; // days
   difficulty: 'beginner' | 'intermediate' | 'advanced';
-  goals: LearningGoal[];
+  goals: {
+    type: 'reading_time' | 'books_completed' | 'quiz_score' | 'ar_sessions';
+    target: number;
+    deadline: Date;
+    progress: number;
+  }[];
   milestones: LearningMilestone[];
   recommendations: ContentRecommendation[];
   createdAt: Date;
@@ -376,7 +395,7 @@ export class LearningAnalysisService {
 
     return interests
       .map(interest => genreMap[interest])
-      .filter(Boolean)
+      .filter((genre): genre is string => Boolean(genre))
       .slice(0, 5); // Limit to top 5 genres
   }
 
@@ -400,7 +419,7 @@ export class LearningAnalysisService {
 
     return interests
       .map(interest => subjectMap[interest])
-      .filter(Boolean)
+      .filter((subject): subject is string => Boolean(subject))
       .slice(0, 3); // Limit to top 3 subjects
   }
 
@@ -435,35 +454,41 @@ export class LearningAnalysisService {
   /**
    * Generate initial learning goals
    */
-  private generateInitialGoals(results: AssessmentResults): LearningGoal[] {
-    const goals: LearningGoal[] = [];
+  private generateInitialGoals(results: AssessmentResults): {
+    type: 'reading_time' | 'books_completed' | 'quiz_score' | 'ar_sessions';
+    target: number;
+    deadline: Date;
+    progress: number;
+  }[] {
+    const goals: {
+      type: 'reading_time' | 'books_completed' | 'quiz_score' | 'ar_sessions';
+      target: number;
+      deadline: Date;
+      progress: number;
+    }[] = [];
 
-    // Reading goal
+    // Reading time goal
     goals.push({
-      id: `goal-reading-${Date.now()}`,
-      type: 'reading',
-      title: 'Daily Reading Habit',
-      description: `Read for ${this.suggestDailyReadingGoal(results)} minutes every day`,
-      targetValue: this.suggestDailyReadingGoal(results),
-      currentValue: 0,
-      unit: 'minutes',
+      type: 'reading_time',
+      target: this.suggestDailyReadingGoal(results) * 7, // Weekly goal
       deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-      isActive: true,
-      createdAt: new Date(),
+      progress: 0,
     });
 
-    // Comprehension goal
+    // Books completed goal
     goals.push({
-      id: `goal-comprehension-${Date.now() + 1}`,
-      type: 'comprehension',
-      title: 'Reading Comprehension',
-      description: 'Improve reading comprehension through quizzes and activities',
-      targetValue: 80,
-      currentValue: 0,
-      unit: 'percentage',
+      type: 'books_completed',
+      target: this.suggestWeeklyBookGoal(results),
+      deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+      progress: 0,
+    });
+
+    // Quiz score goal
+    goals.push({
+      type: 'quiz_score',
+      target: 80, // 80% average score
       deadline: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000), // 60 days
-      isActive: true,
-      createdAt: new Date(),
+      progress: 0,
     });
 
     return goals;
@@ -582,25 +607,36 @@ export class LearningAnalysisService {
   /**
    * Generate personalized goals
    */
-  private generatePersonalizedGoals(learningProfile: LearningProfile, duration: number): LearningGoal[] {
+  private generatePersonalizedGoals(learningProfile: LearningProfile, duration: number): {
+    type: 'reading_time' | 'books_completed' | 'quiz_score' | 'ar_sessions';
+    target: number;
+    deadline: Date;
+    progress: number;
+  }[] {
     return learningProfile.currentGoals || [];
   }
 
   /**
    * Generate learning milestones
    */
-  private generateLearningMilestones(goals: LearningGoal[], duration: number): LearningMilestone[] {
+  private generateLearningMilestones(goals: {
+    type: 'reading_time' | 'books_completed' | 'quiz_score' | 'ar_sessions';
+    target: number;
+    deadline: Date;
+    progress: number;
+  }[], duration: number): LearningMilestone[] {
     const milestones: LearningMilestone[] = [];
 
     goals.forEach((goal, index) => {
+      const goalTitle = goal.type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
       milestones.push({
-        id: `milestone-${goal.id}`,
-        title: `${goal.title} Milestone`,
-        description: `Complete ${goal.description}`,
+        id: `milestone-${goal.type}-${index}`,
+        title: `${goalTitle} Milestone`,
+        description: `Complete ${goal.target} ${goal.type.replace('_', ' ')}`,
         targetDate: new Date(Date.now() + (duration / goals.length) * (index + 1) * 24 * 60 * 60 * 1000),
         completed: false,
         progress: 0,
-        requirements: [`Achieve ${goal.targetValue} ${goal.unit} in ${goal.title}`],
+        requirements: [`Achieve ${goal.target} ${goal.type.replace('_', ' ')}`],
         rewards: ['Achievement badge', 'Progress celebration'],
       });
     });

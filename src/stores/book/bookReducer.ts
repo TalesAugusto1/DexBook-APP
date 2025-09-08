@@ -18,9 +18,6 @@ export const initialBookState: BookState = {
     scanningType: 'qr',
     recognitionProgress: 0,
     recognitionStatus: 'idle',
-    errorMessage: undefined,
-    scannedData: undefined,
-    recognizedBook: undefined,
   },
   
   // User's book library
@@ -101,7 +98,6 @@ export function bookReducer(state: BookState, action: BookAction): BookState {
           scanningType: action.payload.scanningType,
           recognitionStatus: 'scanning',
           recognitionProgress: 0,
-          errorMessage: undefined,
         },
       };
       

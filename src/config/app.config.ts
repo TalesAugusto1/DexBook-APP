@@ -21,7 +21,7 @@ export const appInfo = {
 export const apiConfig = {
   // OpenAI API configuration
   openai: {
-    apiKey: process.env.EXPO_PUBLIC_OPENAI_API_KEY || '',
+    apiKey: process.env['EXPO_PUBLIC_OPENAI_API_KEY'] || '',
     model: 'gpt-4',
     maxTokens: 2000,
     temperature: 0.7
@@ -29,7 +29,7 @@ export const apiConfig = {
   
   // Google Books API configuration
   googleBooks: {
-    apiKey: process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY || '',
+    apiKey: process.env['EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY'] || '',
     baseUrl: 'https://www.googleapis.com/books/v1'
   },
   
@@ -207,7 +207,7 @@ export const environmentConfig = {
 // Get current environment
 export const getCurrentEnvironment = () => {
   if (__DEV__) return 'development';
-  if (process.env.NODE_ENV === 'staging') return 'staging';
+  if (process.env['EXPO_PUBLIC_ENVIRONMENT'] === 'staging') return 'staging';
   return 'production';
 };
 

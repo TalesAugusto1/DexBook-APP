@@ -310,7 +310,7 @@ export function gamificationReducer(state: GamificationState, action: Gamificati
                 ...milestone,
                 currentValue: action.payload.currentValue,
                 isCompleted: action.payload.currentValue >= milestone.targetValue,
-                completedAt: action.payload.currentValue >= milestone.targetValue ? new Date() : milestone.completedAt,
+                ...(action.payload.currentValue >= milestone.targetValue && { completedAt: new Date() }),
               }
             : milestone
         ),
@@ -384,7 +384,7 @@ export function gamificationReducer(state: GamificationState, action: Gamificati
                   ...challenge.userProgress,
                   progress: action.payload.progress,
                   isCompleted: action.payload.progress >= 100,
-                  completedAt: action.payload.progress >= 100 ? new Date() : challenge.userProgress.completedAt,
+                  ...(action.payload.progress >= 100 && { completedAt: new Date() }),
                 },
               }
             : challenge

@@ -47,10 +47,12 @@ export type AuthErrorCode =
   | 'USER_DISABLED'
   | 'TOO_MANY_REQUESTS'
   | 'NETWORK_ERROR'
+  | 'NETWORK_TIMEOUT'
   | 'PROFILE_NOT_FOUND'
   | 'PROFILE_CREATION_FAILED'
   | 'PROFILE_UPDATE_FAILED'
   | 'COPPA_COMPLIANCE_REQUIRED'
+  | 'GOOGLE_SIGNIN_FAILED'
   | 'NO_USER'
   | 'UNKNOWN_ERROR';
 
@@ -212,7 +214,6 @@ export const defaultAuthValidationRules: AuthValidationRules = {
     requireSpecialChars: false,
   },
   email: {
-    allowedDomains: undefined,
     blockedDomains: ['tempmail.com', '10minutemail.com', 'guerrillamail.com'],
   },
   age: {

@@ -7,7 +7,8 @@
 
 import { getAnalytics } from 'firebase/analytics';
 import { initializeApp } from 'firebase/app';
-import { getReactNativePersistence, initializeAuth } from 'firebase/auth';
+import { initializeAuth } from 'firebase/auth';
+// import { getReactNativePersistence } from 'firebase/auth';
 import { connectFirestoreEmulator, initializeFirestore } from 'firebase/firestore';
 import { connectFunctionsEmulator, getFunctions } from 'firebase/functions';
 import { getPerformance } from 'firebase/performance';
@@ -31,10 +32,8 @@ const firebaseConfig = {
 // Initialize Firebase app
 const app = initializeApp(firebaseConfig);
 
-// Initialize Firebase Auth with persistence (React Native)
-const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage),
-});
+// Initialize Firebase Auth
+const auth = initializeAuth(app);
 
 // Initialize Firestore with RN-friendly networking (auto long polling)
 const firestore = initializeFirestore(app, {

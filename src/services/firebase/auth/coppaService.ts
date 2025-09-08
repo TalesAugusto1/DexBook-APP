@@ -106,7 +106,7 @@ export class COPPAService {
         isMinor: true,
         parentEmail: credentials.parentEmail,
         parentName: credentials.parentName,
-        parentPhoneNumber: credentials.parentPhoneNumber,
+        ...(credentials.parentPhoneNumber && { parentPhoneNumber: credentials.parentPhoneNumber }),
         consentGiven: false, // Pending parent approval
         parentVerified: false,
         verificationMethod: 'email',
@@ -149,7 +149,7 @@ export class COPPAService {
       // Update consent request status
       await this.updateConsentRequest(consentRequest.userId, {
         status: approved ? 'approved' : 'denied',
-        ipAddress,
+        ...(ipAddress && { ipAddress }),
       });
 
       if (approved) {
@@ -157,7 +157,7 @@ export class COPPAService {
         await this.updateCOPPAData(consentRequest.userId, {
           consentGiven: true,
           consentDate: new Date(),
-          consentIP: ipAddress,
+          ...(ipAddress && { consentIP: ipAddress }),
           parentVerified: true,
           updatedAt: new Date(),
         });
@@ -194,7 +194,7 @@ export class COPPAService {
         parentConsentRequired: data.isMinor,
         parentConsentGiven: data.consentGiven,
         parentEmail: data.parentEmail,
-        consentDate: data.consentDate,
+        ...(data.consentDate && { consentDate: data.consentDate }),
       };
     } catch (error) {
       console.error('Error fetching COPPA status:', error);
@@ -278,7 +278,7 @@ export class COPPAService {
       childAge: credentials.age,
       parentEmail: credentials.parentEmail,
       parentName: credentials.parentName,
-      parentPhoneNumber: credentials.parentPhoneNumber,
+      ...(credentials.parentPhoneNumber && { parentPhoneNumber: credentials.parentPhoneNumber }),
       requestDate: new Date(),
       consentToken,
       status: 'pending',

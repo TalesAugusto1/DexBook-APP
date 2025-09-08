@@ -200,7 +200,7 @@ export const EnhancedUserProvider: React.FC<{ children: React.ReactNode }> = ({ 
       await userProfileService.saveLearningProfile(learningProfile);
       
       dispatch({ type: 'SET_LEARNING_PROFILE', payload: learningProfile });
-      dispatch({ type: 'ADD_ASSESSMENT_RESULT', payload: assessmentResults.learningStyles || assessmentResults });
+      dispatch({ type: 'ADD_ASSESSMENT_RESULT', payload: assessmentResults });
       dispatch({ type: 'SET_ASSESSMENT_IN_PROGRESS', payload: false });
       
       return learningProfile;

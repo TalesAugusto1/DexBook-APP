@@ -63,7 +63,7 @@ export default function ProfileDashboard() {
           <View style={styles.profileInfo}>
             <View style={styles.profileImageContainer}>
               <Image
-                source={{ uri: authState.user?.profilePicture || 'https://via.placeholder.com/80' }}
+                source={{ uri: authState.user?.avatar || 'https://via.placeholder.com/80' }}
                 style={styles.profileImage}
               />
             </View>
@@ -84,19 +84,19 @@ export default function ProfileDashboard() {
         >
           <View style={styles.statsGrid}>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{userState.statistics?.booksRead || 0}</Text>
+              <Text style={styles.statNumber}>{userState.userStatistics?.totalBooksRead || 0}</Text>
               <Text style={styles.statLabel}>Books Read</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{userState.statistics?.readingStreak || 0}</Text>
+              <Text style={styles.statNumber}>{userState.userStatistics?.currentReadingStreak || 0}</Text>
               <Text style={styles.statLabel}>Day Streak</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{userState.statistics?.totalReadingTime || 0}</Text>
+              <Text style={styles.statNumber}>{Math.round((userState.userStatistics?.totalReadingTime || 0) / 60)}</Text>
               <Text style={styles.statLabel}>Hours Read</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{userState.statistics?.averageScore || 0}%</Text>
+              <Text style={styles.statNumber}>{Math.round(userState.userStatistics?.averageQuizScore || 0)}%</Text>
               <Text style={styles.statLabel}>Avg Score</Text>
             </View>
           </View>
@@ -110,16 +110,7 @@ export default function ProfileDashboard() {
           style={styles.achievementsCard}
         >
           <View style={styles.achievementsList}>
-            {userState.recentAchievements?.length > 0 ? (
-              userState.recentAchievements.slice(0, 3).map((achievement, index) => (
-                <View key={index} style={styles.achievementItem}>
-                  <Text style={styles.achievementTitle}>{achievement.title}</Text>
-                  <Text style={styles.achievementDate}>{achievement.date}</Text>
-                </View>
-              ))
-            ) : (
-              <Text style={styles.noAchievements}>No achievements yet. Start reading to earn badges!</Text>
-            )}
+            <Text style={styles.noAchievements}>No achievements yet. Start reading to earn badges!</Text>
           </View>
           <Button
             title="View All Achievements"
@@ -140,7 +131,7 @@ export default function ProfileDashboard() {
           <View style={styles.learningProfile}>
             <Text style={styles.profileLabel}>Learning Style:</Text>
             <Text style={styles.profileValue}>
-              {userState.learningProfile?.primaryStyle || 'Not assessed'}
+              {userState.learningProfile?.primaryLearningStyle || 'Not assessed'}
             </Text>
             
             <Text style={styles.profileLabel}>Reading Level:</Text>

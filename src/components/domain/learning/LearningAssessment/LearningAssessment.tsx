@@ -11,7 +11,7 @@ import { View, Text, ScrollView, Pressable, Alert } from 'react-native';
 import { Card } from '../../../foundation/Card/Card';
 import { Button } from '../../../foundation/Button/Button';
 import { Loading } from '../../../foundation/Loading/Loading';
-import styles from './LearningAssessment.module.css';
+import { StyleSheet } from 'react-native';
 
 // Assessment Question Types
 export interface AssessmentQuestion {
@@ -188,6 +188,8 @@ export const LearningAssessment: React.FC<LearningAssessmentProps> = ({
   }, [progress, showInterests, onProgress]);
 
   const handleOptionSelect = useCallback((option: AssessmentOption) => {
+    if (!currentQuestion) return;
+    
     const response: AssessmentResponse = {
       questionId: currentQuestion.id,
       optionId: option.id,
@@ -202,6 +204,8 @@ export const LearningAssessment: React.FC<LearningAssessmentProps> = ({
   }, [currentQuestion]);
 
   const handleNext = useCallback(() => {
+    if (!currentQuestion) return;
+    
     const hasResponse = responses.some(r => r.questionId === currentQuestion.id);
     
     if (!hasResponse) {
@@ -214,7 +218,7 @@ export const LearningAssessment: React.FC<LearningAssessmentProps> = ({
     } else {
       setCurrentQuestionIndex(prev => prev + 1);
     }
-  }, [currentQuestion.id, responses, isLastQuestion]);
+  }, [currentQuestion?.id, responses, isLastQuestion]);
 
   const handlePrevious = useCallback(() => {
     if (showInterests) {
@@ -313,6 +317,7 @@ export const LearningAssessment: React.FC<LearningAssessmentProps> = ({
   }, [selectedInterests, calculateResults, onComplete, onProgress]);
 
   const getSelectedResponse = useCallback(() => {
+    if (!currentQuestion) return undefined;
     return responses.find(r => r.questionId === currentQuestion.id);
   }, [responses, currentQuestion]);
 
@@ -399,12 +404,12 @@ export const LearningAssessment: React.FC<LearningAssessmentProps> = ({
             </View>
           </View>
 
-          <Text style={styles.title}>{currentQuestion.question}</Text>
-          <Text style={styles.description}>{currentQuestion.description}</Text>
+          <Text style={styles.title}>{currentQuestion?.question}</Text>
+          <Text style={styles.description}>{currentQuestion?.description}</Text>
         </View>
 
         <View style={styles.options}>
-          {currentQuestion.options.map((option) => {
+          {currentQuestion?.options.map((option) => {
             const isSelected = getSelectedResponse()?.optionId === option.id;
             
             return (
@@ -446,3 +451,144 @@ export const LearningAssessment: React.FC<LearningAssessmentProps> = ({
     </ScrollView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8fafc',
+  },
+  card: {
+    margin: 16,
+    padding: 20,
+  },
+  header: {
+    marginBottom: 24,
+  },
+  progressContainer: {
+    marginBottom: 16,
+  },
+  progressText: {
+    fontSize: 14,
+    color: '#64748b',
+    marginBottom: 8,
+  },
+  progressBar: {
+    height: 4,
+    backgroundColor: '#e2e8f0',
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#3b82f6',
+    borderRadius: 2,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#1e293b',
+    marginBottom: 8,
+  },
+  description: {
+    fontSize: 14,
+    color: '#64748b',
+    lineHeight: 20,
+  },
+  options: {
+    marginBottom: 24,
+  },
+  option: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    marginBottom: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  optionSelected: {
+    borderColor: '#3b82f6',
+    backgroundColor: '#eff6ff',
+  },
+  radioButton: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#d1d5db',
+    marginRight: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radioButtonSelected: {
+    borderColor: '#3b82f6',
+  },
+  radioButtonInner: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#3b82f6',
+  },
+  optionText: {
+    flex: 1,
+    fontSize: 16,
+    color: '#374151',
+  },
+  optionTextSelected: {
+    color: '#1e293b',
+    fontWeight: '500',
+  },
+  navigation: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  navButton: {
+    flex: 1,
+  },
+  interestsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 16,
+  },
+  interestChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: '#f1f5f9',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  interestChipSelected: {
+    backgroundColor: '#3b82f6',
+    borderColor: '#3b82f6',
+  },
+  interestChipText: {
+    fontSize: 14,
+    color: '#64748b',
+  },
+  interestChipTextSelected: {
+    color: '#ffffff',
+    fontWeight: '500',
+  },
+  selectionCount: {
+    fontSize: 14,
+    color: '#64748b',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#64748b',
+    marginTop: 16,
+    textAlign: 'center',
+  },
+});

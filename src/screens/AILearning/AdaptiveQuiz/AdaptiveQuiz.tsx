@@ -70,6 +70,14 @@ export const AdaptiveQuiz: React.FC = () => {
 
   const currentQ = questions[currentQuestion];
 
+  if (!currentQ) {
+    return (
+      <View style={styles.container}>
+        <Text>No questions available</Text>
+      </View>
+    );
+  }
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
