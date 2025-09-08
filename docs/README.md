@@ -256,3 +256,4 @@ ARBookExplorer/
 **📅 Última atualização: Dezembro 2024**  
 **👥 Mantido por: Equipe AR Book Explorer**  
 **📧 Suporte: [Canal de suporte]**
+

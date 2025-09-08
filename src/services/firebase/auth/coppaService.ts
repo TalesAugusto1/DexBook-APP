@@ -405,3 +405,4 @@ export class COPPAService {
 
 // Export singleton instance
 export const coppaService = new COPPAService();
+

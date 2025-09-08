@@ -522,3 +522,4 @@ export class UserProfileService {
 
 // Export singleton instance
 export const userProfileService = new UserProfileService();
+

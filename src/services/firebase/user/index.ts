@@ -9,3 +9,4 @@
 export { UserProfileService, userProfileService, UserProfileServiceError } from './userProfileService';
 
 // Types are imported from stores/user/types - no duplication needed
+

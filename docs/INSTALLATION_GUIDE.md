@@ -417,3 +417,4 @@ npx expo install --check
 **Documentação atualizada: Dezembro 2024**
 **Versão do projeto: 1.0.0**
 **Status: Sprint 2 - Authentication & User Management**
+

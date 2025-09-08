@@ -246,3 +246,4 @@ export interface BookValidationRules {
 }
 
 export default BookState;
+

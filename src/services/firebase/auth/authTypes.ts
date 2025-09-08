@@ -221,3 +221,4 @@ export const defaultAuthValidationRules: AuthValidationRules = {
     coppaThreshold: 13,
   },
 };
+

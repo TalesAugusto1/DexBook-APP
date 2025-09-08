@@ -522,3 +522,4 @@ npx expo install --check
 ---
 
 **Esta documentação é mantida atualizada pela equipe de desenvolvimento. Última atualização: Dezembro 2024**
+

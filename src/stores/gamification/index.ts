@@ -29,3 +29,4 @@ export type {
 
 // Default export
 export { default as GamificationContext } from './GamificationContext';
+
