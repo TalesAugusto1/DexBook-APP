@@ -5,19 +5,19 @@
  * Following AlLibrary coding rules for accessibility-first design and universal access.
  */
 
-import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
-import { authReducer, AuthState, loginStart, loginSuccess, loginFailure, logout, updateProfile, clearError } from './authStore';
-import { AuthContextType, LoginCredentials, RegisterCredentials } from './authTypes';
-import { User } from '../../types/user';
+import React, { createContext, ReactNode, useContext, useEffect, useReducer } from 'react';
 import { auth } from '../../config/firebase.config';
-import { 
-  authService, 
-  coppaService, 
-  COPPARegistrationCredentials,
-  AuthServiceError 
+import {
+    authService,
+    COPPARegistrationCredentials,
+    coppaService
 } from '../../services/firebase/auth';
+import { AuthServiceError } from '../../services/firebase/auth/authTypes';
 import { socialAuthService } from '../../services/firebase/auth/socialAuthService';
+import { User } from '../../types/user';
+import { authReducer, clearError, loginFailure, loginStart, loginSuccess, logout, updateProfile } from './authStore';
+import { AuthContextType, LoginCredentials, RegisterCredentials } from './authTypes';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -36,21 +36,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Listen for authentication state changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      // eslint-disable-next-line no-console
+      console.log('AuthContext: onAuthStateChanged triggered', { 
+        hasUser: !!firebaseUser, 
+        uid: firebaseUser?.uid,
+        email: firebaseUser?.email 
+      });
+
       if (firebaseUser) {
         try {
           // Get user profile from Firestore
           const userProfile = await authService.getUserProfile(firebaseUser.uid);
           if (userProfile) {
+            // eslint-disable-next-line no-console
+            console.log('AuthContext: User profile loaded successfully', { email: userProfile.email });
             dispatch(loginSuccess(userProfile));
           } else {
+            // eslint-disable-next-line no-console
+            console.warn('AuthContext: Firebase user exists but no profile found');
             // Firebase user exists but no profile, handle edge case
             dispatch(loginFailure('User profile not found'));
           }
         } catch (error) {
-          console.error('Error fetching user profile:', error);
+          // eslint-disable-next-line no-console
+          console.error('AuthContext: Error fetching user profile:', error);
           dispatch(loginFailure('Failed to load user profile'));
         }
       } else {
+        // eslint-disable-next-line no-console
+        console.log('AuthContext: User is not authenticated, dispatching logout');
         // User is not authenticated
         dispatch(logout());
       }
@@ -62,8 +76,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (credentials: LoginCredentials): Promise<void> => {
     try {
       dispatch(loginStart());
-      const user = await authService.signInWithEmail(credentials);
-      dispatch(loginSuccess(user));
+      // Let Firebase handle the authentication and let onAuthStateChanged handle the state update
+      await authService.signInWithEmail(credentials);
+      // Don't manually dispatch loginSuccess here - let onAuthStateChanged handle it
     } catch (error) {
       const errorMessage = error instanceof AuthServiceError 
         ? error.message 
@@ -82,8 +97,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return;
       }
       
-      const user = await authService.registerWithEmail(credentials);
-      dispatch(loginSuccess(user));
+      // Let Firebase handle the registration and let onAuthStateChanged handle the state update
+      await authService.registerWithEmail(credentials);
+      // Don't manually dispatch loginSuccess here - let onAuthStateChanged handle it
     } catch (error) {
       const errorMessage = error instanceof AuthServiceError 
         ? error.message 
@@ -110,9 +126,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signInWithGoogle = async (): Promise<void> => {
     try {
       dispatch(loginStart());
-      const user = await socialAuthService.signInWithGoogle();
-      dispatch(loginSuccess(user));
+      // eslint-disable-next-line no-console
+      console.log('AuthContext: Starting Google Sign-In...');
+      // Let Firebase handle the authentication and let onAuthStateChanged handle the state update
+      await socialAuthService.signInWithGoogle();
+      // eslint-disable-next-line no-console
+      console.log('AuthContext: Google Sign-In successful');
+      // Don't manually dispatch loginSuccess here - let onAuthStateChanged handle it
     } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('AuthContext: Google Sign-In error:', error);
       const errorMessage = error instanceof AuthServiceError 
         ? error.message 
         : 'Google Sign-In failed';
@@ -123,8 +146,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signInWithApple = async (): Promise<void> => {
     try {
       dispatch(loginStart());
-      const user = await socialAuthService.signInWithApple();
-      dispatch(loginSuccess(user));
+      // Let Firebase handle the authentication and let onAuthStateChanged handle the state update
+      await socialAuthService.signInWithApple();
+      // Don't manually dispatch loginSuccess here - let onAuthStateChanged handle it
     } catch (error) {
       const errorMessage = error instanceof AuthServiceError 
         ? error.message 
@@ -157,11 +181,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const handleLogout = async (): Promise<void> => {
     try {
+      // eslint-disable-next-line no-console
+      console.log('AuthContext: Starting logout process');
+      
+      // Sign out from Firebase
       await authService.signOut();
+      
+      // Sign out from Google if the user was signed in with Google
+      await authService.signOutGoogle();
+      
+      // eslint-disable-next-line no-console
+      console.log('AuthContext: Logout completed successfully');
       dispatch(logout());
     } catch (error) {
-      console.error('Logout error:', error);
-      // Force logout even if Firebase signOut fails
+      // eslint-disable-next-line no-console
+      console.error('AuthContext: Logout error:', error);
+      // Force logout even if signOut fails
       dispatch(logout());
     }
   };

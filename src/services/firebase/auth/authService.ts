@@ -5,21 +5,23 @@
  * Following AlLibrary coding rules for security-first architecture and COPPA compliance.
  */
 
+import * as AuthSession from 'expo-auth-session';
+import { makeRedirectUri, ResponseType } from 'expo-auth-session';
 import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  sendPasswordResetEmail,
-  sendEmailVerification,
-  updateProfile,
-  GoogleAuthProvider,
-  signInWithCredential,
-  OAuthProvider,
-  UserCredential,
-  User as FirebaseUser,
-  AuthError,
+    AuthError,
+    createUserWithEmailAndPassword,
+    User as FirebaseUser,
+    GoogleAuthProvider,
+    OAuthProvider,
+    sendEmailVerification,
+    sendPasswordResetEmail,
+    signInWithCredential,
+    signInWithEmailAndPassword,
+    signOut,
+    updateProfile,
+    UserCredential,
 } from 'firebase/auth';
-import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, firestore } from '../../../config/firebase.config';
 import { User } from '../../../types/user';
 import { AuthServiceError, LoginCredentials, RegisterCredentials } from './authTypes';
@@ -29,25 +31,19 @@ import { AuthServiceError, LoginCredentials, RegisterCredentials } from './authT
  * Handles all authentication operations with Firebase
  */
 export class AuthService {
+  constructor() {}
+
   /**
    * Sign in with email and password
    */
-  async signInWithEmail(credentials: LoginCredentials): Promise<User> {
+  async signInWithEmail(credentials: LoginCredentials): Promise<void> {
     try {
-      const userCredential = await signInWithEmailAndPassword(
+      await signInWithEmailAndPassword(
         auth,
         credentials.email,
         credentials.password
       );
-
-      // Get user profile from Firestore
-      const userProfile = await this.getUserProfile(userCredential.user.uid);
-      
-      if (!userProfile) {
-        throw new AuthServiceError('User profile not found', 'PROFILE_NOT_FOUND');
-      }
-
-      return userProfile;
+      // Let onAuthStateChanged handle the user profile fetching
     } catch (error) {
       throw this.handleAuthError(error as AuthError);
     }
@@ -56,7 +52,7 @@ export class AuthService {
   /**
    * Register new user with email and password
    */
-  async registerWithEmail(credentials: RegisterCredentials): Promise<User> {
+  async registerWithEmail(credentials: RegisterCredentials): Promise<void> {
     try {
       // Validate age for COPPA compliance
       if (credentials.age < 13) {
@@ -66,11 +62,21 @@ export class AuthService {
         );
       }
 
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        credentials.email,
-        credentials.password
-      );
+      // Add a network timeout to avoid hanging if connectivity is poor
+      const TIMEOUT_MS = 15000;
+      const userCredential = await Promise.race<UserCredential | never>([
+        createUserWithEmailAndPassword(
+          auth,
+          credentials.email,
+          credentials.password
+        ),
+        new Promise<never>((_, reject) =>
+          setTimeout(
+            () => reject(new AuthServiceError('Network timeout during registration', 'NETWORK_TIMEOUT')),
+            TIMEOUT_MS,
+          )
+        ),
+      ]);
 
       // Update Firebase Auth profile
       await updateProfile(userCredential.user, {
@@ -97,40 +103,80 @@ export class AuthService {
         updatedAt: new Date(),
       };
 
-      await this.createUserProfile(userProfile);
+      // Profile write with timeout as well to prevent indefinite loading
+      await Promise.race([
+        this.createUserProfile(userProfile),
+        new Promise<never>((_, reject) =>
+          setTimeout(
+            () => reject(new AuthServiceError('Network timeout creating user profile', 'NETWORK_TIMEOUT')),
+            TIMEOUT_MS,
+          )
+        ),
+      ]);
 
-      return userProfile;
+      // Let onAuthStateChanged handle the state update
     } catch (error) {
       throw this.handleAuthError(error as AuthError);
     }
   }
 
   /**
-   * Sign in with Google
+   * Sign in with Google. If an ID token is provided, uses it directly.
+   * Otherwise falls back to initiating the AuthSession flow.
    */
-  async signInWithGoogle(idToken: string): Promise<User> {
+  async signInWithGoogle(idToken?: string): Promise<void> {
     try {
-      const credential = GoogleAuthProvider.credential(idToken);
-      const userCredential = await signInWithCredential(auth, credential);
-
-      // Check if user profile exists, create if not
-      let userProfile = await this.getUserProfile(userCredential.user.uid);
-      
-      if (!userProfile) {
-        // Create new profile for Google sign-in user
-        userProfile = await this.createGoogleUserProfile(userCredential.user);
+      // If an ID token is provided (preferred path via SocialAuthService)
+      if (idToken) {
+        const googleCredential = GoogleAuthProvider.credential(idToken);
+        await signInWithCredential(auth, googleCredential);
+        // Let onAuthStateChanged handle the user profile fetching
+        return;
       }
 
-      return userProfile;
+      // Fallback: initiate AuthSession to obtain id_token
+      const redirectUri = makeRedirectUri({ useProxy: true });
+      const clientId = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || '';
+      const discovery = {
+        authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
+        tokenEndpoint: 'https://oauth2.googleapis.com/token',
+      } as const;
+
+      const authRequest = new AuthSession.AuthRequest({
+        clientId,
+        redirectUri,
+        responseType: ResponseType.IdToken,
+        scopes: ['openid', 'profile', 'email'],
+        extraParams: { nonce: Math.random().toString(36).slice(2) },
+      });
+
+      await authRequest.makeAuthUrlAsync(discovery);
+      const result = await authRequest.promptAsync(discovery, {} as any);
+
+      if (result.type !== 'success' || !result.params['id_token']) {
+        throw new AuthServiceError('Google Sign-In cancelled or failed', 'GOOGLE_SIGNIN_FAILED');
+      }
+
+      const googleCredential = GoogleAuthProvider.credential(result.params['id_token']);
+      await signInWithCredential(auth, googleCredential);
+      // Let onAuthStateChanged handle the user profile fetching
     } catch (error) {
       throw this.handleAuthError(error as AuthError);
     }
+  }
+
+  /**
+   * Sign out from Google
+   */
+  async signOutGoogle(): Promise<void> {
+    // No-op for AuthSession; Firebase signOut is sufficient.
+    return;
   }
 
   /**
    * Sign in with Apple
    */
-  async signInWithApple(identityToken: string, nonce: string): Promise<User> {
+  async signInWithApple(identityToken: string, nonce: string): Promise<void> {
     try {
       const provider = new OAuthProvider('apple.com');
       const credential = provider.credential({
@@ -138,17 +184,8 @@ export class AuthService {
         rawNonce: nonce,
       });
 
-      const userCredential = await signInWithCredential(auth, credential);
-
-      // Check if user profile exists, create if not
-      let userProfile = await this.getUserProfile(userCredential.user.uid);
-      
-      if (!userProfile) {
-        // Create new profile for Apple sign-in user
-        userProfile = await this.createAppleUserProfile(userCredential.user);
-      }
-
-      return userProfile;
+      await signInWithCredential(auth, credential);
+      // Let onAuthStateChanged handle the user profile fetching
     } catch (error) {
       throw this.handleAuthError(error as AuthError);
     }
@@ -202,8 +239,8 @@ export class AuthService {
         const data = userDoc.data();
         return {
           ...data,
-          createdAt: data.createdAt?.toDate() || new Date(),
-          updatedAt: data.updatedAt?.toDate() || new Date(),
+          createdAt: data['createdAt']?.toDate() || new Date(),
+          updatedAt: data['updatedAt']?.toDate() || new Date(),
         } as User;
       }
       

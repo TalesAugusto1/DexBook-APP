@@ -1,14 +1,14 @@
 /**
  * Welcome Screen for AR Book Explorer
  * 
- * Welcome screen using expo-router navigation.
+ * Welcome screen using expo-router navigation with authentication guard.
  * Following AlLibrary coding rules for accessibility-first design and universal access.
  */
 
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Button, Card, Modal } from '../src/components/foundation';
+import React, { useState } from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { AuthGuard, Button, Card, Modal } from '../src/components/foundation';
 
 export default function WelcomeScreen() {
   const router = useRouter();
@@ -27,7 +27,8 @@ export default function WelcomeScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <AuthGuard requireAuth={false}>
+      <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Welcome to AR Book Explorer!</Text>
         <Text style={styles.subtitle}>
@@ -129,6 +130,7 @@ export default function WelcomeScreen() {
         </View>
       </Modal>
     </ScrollView>
+    </AuthGuard>
   );
 }
 

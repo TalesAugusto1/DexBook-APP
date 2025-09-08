@@ -12,7 +12,12 @@
           "package_name": "com.upx.dexbook"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "721919310516-vka2n6dbnu30lsuqaetvnlhlck2jn5in.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBLqIR2i2MRo0kPGtuIRdirRR2TcryxLdw"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "721919310516-vka2n6dbnu30lsuqaetvnlhlck2jn5in.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
